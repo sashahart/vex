@@ -1,0 +1,219 @@
+Vex
+###
+
+Run a command in the named virtualenv.
+
+vex is an alternative to virtualenv's ``source wherever/bin/activate``
+and ``deactivate``, and virtualenvwrapper's ``workon``, and also
+virtualenv-burrito if you use that. 
+It works in a more elegant way, though it does less.
+You might find it nicer to use.
+And it works with non-bash shells. 
+
+(It doesn't make or remove virtualenvs, though. Should it?)
+
+
+How it works
+============
+
+``vex`` just runs any command in a virtualenv, without modifying the current
+shell environment.
+
+To know why this is different, you have to understand a little about how
+virtualenv normally works.
+The normal way people use a virtualenv (other than virtualenvwrapper,
+which does this for them) is to open a shell and source
+a file called ``whatever/bin/activate``. 
+Sourcing this shell script modifies the environment in the current shell.
+It saves the old values and sets up a shell function named ``deactivate``
+which restores those old values. When you run ``deactivate`` it restores
+its saved values.
+This is also the way virtualenvwrapper's ``workon`` functions - after all, it
+is a wrapper for virtualenv.
+If you want to use a virtualenv inside a script you probably don't use
+activate, though, you just run the python that is inside the virtualenv's
+bin/ directory.
+
+The way virtualenv's activate works isn't elegant, but it usually works fine.
+It's just specific to the shell, and sometimes gets a little fiddly, because of
+that decision to modify the current shell environment.
+
+The principle of ``vex`` is much simpler, and it doesn't care what shell you
+use, because it does not modify the current environment. It only sets up the
+environment of the new process, and those environment settings just go away
+when the process does. So no ``deactivate`` or restoration of environment is
+necessary.
+
+For example, if you run ``vex bash`` then that bash shell has the right
+environment setup, but specifically "deactivating the virtualenv" is
+unnecessary; the virtualenv "deactivates" when the process ends,
+e.g. if you use ``exit`` or Ctrl-D as normal to leave bash. That's just
+an example with bash, it works the same with anything.
+(More examples in the Examples section.)
+
+
+Examples
+========
+
+vex should work with most commands you can think of. 
+Try it out. 
+
+vex foo bash
+	Launch a bash shell with virtualenv foo activated in it.
+	To deactivate, just exit the shell (using "exit" or Ctrl-D).
+
+vex foo python
+	Launch a Python interpreter inside virtualenv foo.
+
+vex foo which python
+    Verify the path to python from inside virtualenv foo.
+
+vex foo pip freeze
+	See what's installed in virtualenv foo.
+
+vex foo pip install ipython
+	Install ipython inside virtualenv foo.
+
+vex foo ipython
+	Launch the ipython interpreter you have installed inside virtualenv foo.
+
+
+If you break things by doing weird fun things with vex, you get to keep all the
+pieces left over.
+
+
+How to install vex
+==================
+
+NOTE: RIGHT NOW THIS DOES NOT INSTALL WITH PIP/PYPI BECAUSE IT HAS NOT BEEN
+PUSHED TO PYPI. IT NEEDS SOME CLEANUPS AND A DECENT TEST SUITE BEFORE THAT WILL
+HAPPEN.
+
+You can just 'pip install vex,' but for convenience it's recommended to install
+vex with the user scheme as follows::
+
+    pip install --user vex
+
+There are two reasons for this.
+
+First, it is not that convenient to use vex only from a virtualenv (though you
+can) because then you need to use some other technique to activate the
+virtualenv in which you have vex installed, in order to get access to it.
+
+Second, it does not require root privileges and does not make any system-wide
+messes. Installing Python libraries system-wide is something you should
+normally leave to your OS package manager; you are probably doing yourself
+a favor if you learn never to use 'sudo pip' or 'sudo easy_install'.
+
+You shouldn't normally have to separately install virtualenv; pip should drag
+that in if you don't already have it.
+
+If you don't have pip, `learn to install pip <http://pip.readthedocs.org/en/latest/installing.html>`_.
+
+.. If you want to upgrade vex, you can similarly use
+..     pip install --upgrade --user vex
+
+To uninstall, just use ``pip uninstall vex -y``.
+
+
+
+Options
+=======
+
+vex is simple so there aren't a lot of options.
+
+Since everyone seems to like workon more than specifying absolute
+virtualenv paths, vex defaults to that kind of behavior.
+But it may still be necessary to use an absolute path now and then.
+So you can point vex at the absolute path of a virtualenv with ``--path``.
+For example, if you made a virtualenv under the current directory
+called env and don't want to type out ``source env/bin/activate``::
+
+    vex --path env pip freeze
+
+You can also set which directory the subprocess starts in,
+like this shell which starts in ``/tmp``::
+
+    vex --cwd /tmp foo bash
+
+
+
+Config
+======
+
+Like many user-oriented command line utilities, vex has an optional config
+file to specify defaults. Its default location ``~/.vexrc``. Example::
+
+    shell=bash
+    virtualenvs=~/.my_virtualenvs
+    env:
+        ANSWER=42
+
+This specifies that the result of running ``vex foo`` (no command)
+is to run bash, as in ``vex foo bash``;
+that the place to look for named virtualenvs
+is ``~/.my_virtualenvs``; and that processes launched by vex should all
+get certain environment variables (in this case, ``ANSWER`` set to ``42``).
+
+If you want to use a config someplace other than ``~/.vexrc``::
+
+    vex --config ~/.tempvexrc foo bash
+
+
+Caveats
+=======
+
+Put optional flags for vex right after ``vex``. If you put them in the
+command, vex will naturally think they are meant for the command.
+For example, ``vex foo mope -h`` cannot be understood as providing
+an -h flag to vex; vex has to interpret it as part of the command.
+Even ``vex foo -h mope`` must interpret '-h mope' as a command, because it is
+possible that an executable name on $PATH begins with a dash.
+
+vex won't use virtualenvs with names that start with a dash, because this is
+the character which prefixes a command-line flag (option). Tough break.
+
+Don't be surprised if 'vex foo sudo bash' results in a shell that doesn't use
+your virtualenv. Safe sudo policy often controls the environment, notably as
+a default on Debian and Ubuntu. It's better not to mess with this policy,
+especially if you knew little enough that you wondered why it didn't work.
+As a workaround, you can use this::
+    
+    sudo env PATH="$PATH" vex foo bash
+
+vex should not be noticeably slow to mere mortals, but if you run it a million
+times in a script then the effects of python startup might become noticeable.
+If you have this problem, consider running your virtualenv's python directly.
+(It works at least as well, it's just usually less convenient.)
+
+If you run e.g. ``bash -c ls`` you may see that ls does not generate color,
+because it decides whether to do that after detecting whether it is talking to
+a terminal. Similarly, commands run through vex are liable to suppress their
+color. Things like grep can be given options like --color=always, but then 
+piped or redirected output will contain color codes. If you want to run Python
+unit tests in virtualenvs, just use `tox <http://tox.readthedocs.org/en/latest/>`_, 
+it's great.
+
+As with other tools, if you want to use a virtualenv with spaces in the name,
+your shell is probably going to force you to quote its name in order to make
+the tool understand you are not providing more than one actual argument.
+For example, ``vex foo bar baz`` will be interpreted by bash/zsh as running
+'bar baz' in virtualenv foo, NOT as running baz in 'foo bar' or anything else.
+Again, this isn't down to vex, it is just how these shells work.
+
+Mind the results of asking to run commands with shell variables in them.
+For example, you might expect this to print 'foo'::
+
+    vex foo echo $VIRTUAL_ENV
+
+The reason it doesn't is that your current shell is interpreting $VIRTUAL_ENV
+even before vex gets it or can pass it to the subprocess. You could quote it::
+
+    vex foo echo '$VIRTUAL_ENV'
+
+but then it literally prints $VIRTUAL_ENV, not the shell evaluation of the
+variable, because that isn't the job of vex. That's a job for bash to do.
+
+.. code-block::
+
+    vex foo bash -c 'echo $VIRTUAL_ENV'
