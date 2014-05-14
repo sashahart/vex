@@ -5,9 +5,7 @@ import sys
 import subprocess
 
 if sys.version_info < (3, 0):
-    NotFoundError = OSError
-else:
-    NotFoundError = FileNotFoundError
+    FileNotFoundError = OSError
 
 
 def get_ve_base(vexrc):
@@ -93,9 +91,6 @@ def run(command, env, cwd):
     try:
         process = subprocess.Popen(command, env=env, cwd=cwd)
         process.wait()
-    except NotFoundError as error:
-        # Don't handle kinds of OSError other than file not found
-        if not error.errno == 2:
-            raise
+    except FileNotFoundError:
         return None
     return process.returncode
