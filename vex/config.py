@@ -1,5 +1,6 @@
 """Config file processing (.vexrc).
 """
+import sys
 import re
 from collections import defaultdict
 
@@ -8,6 +9,10 @@ _HEADING_RE = re.compile(
     r'^(' + _IDENTIFIER_PATTERN + r'):[ \t\n\r]*\Z')
 _VAR_RE = re.compile(
     r'[ \t]*(' + _IDENTIFIER_PATTERN + r') *= *(.*)[ \t\n\r]*$')
+
+
+if sys.version_info < (3, 0):
+    FileNotFoundError = OSError
 
 
 class InvalidConfigError(Exception):
@@ -30,7 +35,11 @@ def read_vexrc(full_path):
     headings[None] = {}
     errors = []
 
-    with open(full_path, 'rb') as inp:
+    try:
+        inp = open(full_path, 'rb')
+    except FileNotFoundError:
+        return headings
+    with inp:
         heading = None
         for i, line in enumerate(inp):
             line = line.decode('utf-8')
