@@ -77,6 +77,10 @@ vex foo pip install ipython
 vex foo ipython
 	Launch the ipython interpreter you have installed inside virtualenv foo.
 
+vex foo
+    Launch your shell (as specified in SHELL or ~/.vexrc) in virtualenv foo
+    (this is like a direct replacement for 'workon').
+
 
 If you break things by doing weird fun things with vex, you get to keep all the
 pieces left over.
