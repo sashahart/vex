@@ -24,7 +24,7 @@ def main():
         arg_parser.print_help()
         return _barf("unknown args: {0!r}".format(unknown))
 
-    vexrc = config.read_vexrc(options.config)
+    vexrc = config.read_vexrc(options.config, environ)
     ve_base = get_ve_base(vexrc)
     if not options.path and not ve_base:
         return _barf(
