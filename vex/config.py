@@ -15,8 +15,8 @@ _VAR_RE = re.compile(
     r'[ \t]*(' + _IDENTIFIER_PATTERN + r') *= *(.*)[ \t\n\r]*$')
 
 
-if sys.version_info < (3, 0):
-    FileNotFoundError = OSError
+if sys.version_info < (3, 3):
+    FileNotFoundError = IOError
 
 
 class InvalidConfigError(Exception):
@@ -56,7 +56,9 @@ class Vexrc(object):
     def read(self, path, environ):
         try:
             inp = open(path, 'rb')
-        except FileNotFoundError:
+        except FileNotFoundError as error:
+            if error.errno != 2:
+                raise
             return None
         parsing = parse_vexrc(inp, environ)
         for heading, key, value in parsing:

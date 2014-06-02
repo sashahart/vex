@@ -4,8 +4,10 @@ import os
 import sys
 import subprocess
 
-if sys.version_info < (3, 0):
-    FileNotFoundError = OSError
+if sys.version_info > (3, 3):
+    CommandNotFoundError = FileNotFoundError
+else:
+    CommandNotFoundError = OSError
 
 
 class BadConfigError(Exception):
@@ -75,6 +77,8 @@ def run(command, env, cwd):
     try:
         process = subprocess.Popen(command, env=env, cwd=cwd)
         process.wait()
-    except FileNotFoundError:
+    except CommandNotFoundError as error:
+        if error.errno != 2:
+            raise
         return None
     return process.returncode
