@@ -172,6 +172,22 @@ to reflect the current virtualenv, since vex intentionally does not mess with
 your shell's prompt (in order to stay shell-agnostic).
 
 
+bash
+----
+
+Here is an example of what you could put in ~/.bashrc:
+
+.. code-block:: bash
+
+    function virtualenv_prompt() {
+        if [ -n "$VIRTUAL_ENV" ]; then
+            echo "(${VIRTUAL_ENV##*/}) "
+        fi
+    }
+
+    export PS1='$(virtualenv_prompt)\u@\H> '
+
+
 Caveats
 =======
 
