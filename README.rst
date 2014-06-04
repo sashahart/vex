@@ -206,6 +206,18 @@ Here is an example of what you could put in ~/.zshrc:
 
     export PROMPT='$(virtualenv_prompt)%n@%m> '
 
+ksh
+---
+
+Here is something you can start from in ~/.kshrc:
+
+.. code-block:: ksh
+
+    PS1='${VIRTUAL_ENV:+($( basename $VIRTUAL_ENV )) }${USER}@${HOSTNAME:=$(hostname)}:$PWD> '
+
+This should also work for mksh in ~/.mkshrc.
+
+
 Caveats
 =======
 
