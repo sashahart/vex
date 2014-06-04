@@ -11,6 +11,7 @@ setup(
     keywords="virtualenv virtualenvwrapper workon",
     install_requires=['virtualenv'],
     packages=['vex'],
+    package_data={'vex': ['shell_configs/*']},
     scripts=['scripts/vex'],
     classifiers=[
         "Development Status :: 2 - Pre-Alpha",

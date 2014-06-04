@@ -50,6 +50,14 @@ def make_arg_parser():
         help="path to config file to read (default: '~/.vexrc')"
     )
     parser.add_argument(
+        '--shell-config',
+        metavar="SHELL",
+        dest="shell_to_configure",
+        action="store",
+        default=None,
+        help="print optional config for evaluation by the specified shell"
+    )
+    parser.add_argument(
         "rest",
         nargs=argparse.REMAINDER,
         help=argparse.SUPPRESS)
@@ -68,6 +76,13 @@ def main_logic(environ, argv):
         return _barf("unknown args: {0!r}".format(unknown))
 
     vexrc = config.Vexrc.from_file(options.config, environ)
+
+    if options.shell_to_configure is not None:
+        from . import shell_config
+        shell_config.emit_shell_config_for(
+            options.shell_to_configure, vexrc, environ)
+        return 0
+
     ve_base = vexrc.get_ve_base(environ)
     if not options.path and not ve_base:
         return _barf(
