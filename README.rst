@@ -218,6 +218,22 @@ Here is something you can start from in ~/.kshrc:
 This should also work for mksh in ~/.mkshrc.
 
 
+tcsh
+----
+
+If you're among the proud few who use tcsh, this kind of works
+(and you may ridicule my terrible csh skills and propose a better solution!)
+However, it relies on $VIRTUAL_ENV never changing, so in other words it's
+really only usable if you stick to vex when using tcsh, and don't mess with
+$VIRTUAL_ENV yourself.
+
+.. code-block:: tcsh
+
+    if ($?VIRTUAL_ENV == 0) then
+        set VIRTUAL_ENV=""
+    endif
+    set prompt="`if ( "$VIRTUAL_ENV" != "" ) basename $VIRTUAL_ENV`|%N@%m:%~%# "
+
 Caveats
 =======
 
