@@ -188,6 +188,24 @@ Here is an example of what you could put in ~/.bashrc:
     export PS1='$(virtualenv_prompt)\u@\H> '
 
 
+zsh
+---
+
+Here is an example of what you could put in ~/.zshrc:
+
+.. code-block:: zsh
+
+    # zsh needs this option set to use $(virtualenv_prompt)
+    setopt prompt_subst
+
+    function virtualenv_prompt() {
+        if [ -n "$VIRTUAL_ENV" ]; then
+            echo "(${VIRTUAL_ENV##*/}) "
+        fi
+    }
+
+    export PROMPT='$(virtualenv_prompt)%n@%m> '
+
 Caveats
 =======
 
