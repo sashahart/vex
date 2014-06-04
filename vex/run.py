@@ -8,35 +8,12 @@ if sys.version_info < (3, 0):
     FileNotFoundError = OSError
 
 
-def get_ve_base(vexrc):
-    """Find a directory to look for virtualenvs in.
-    """
-    # set ve_base to a path we can look for virtualenvs:
-    # 1. .vexrc
-    # 2. WORKON_HOME (as defined for virtualenvwrapper's benefit)
-    # 3. $HOME/.virtualenvs
-    # (unless we got --path, then we don't need it)
-    ve_base = vexrc[None].get('virtualenvs')
-    if ve_base:
-        ve_base = os.path.expanduser(ve_base)
-    else:
-        ve_base = os.environ.get('WORKON_HOME')
-    if not ve_base:
-        home = os.environ.get('HOME', None)
-        if not home:
-            return None
-        ve_base = os.path.join(home, '.virtualenvs')
-    return ve_base
+class BadConfigError(Exception):
+    pass
 
 
-def get_command(options, vexrc):
-    """Find a command to run.
-    """
-    command = options.rest
-    if not command:
-        command = vexrc[None].get('shell') or os.environ.get('SHELL')
-        command = [command] if command else None
-    return command
+def error(message):
+    raise BadConfigError(message)
 
 
 def make_env(environ, defaults, options):

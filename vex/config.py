@@ -1,8 +1,10 @@
 """Config file processing (.vexrc).
 """
+import os
 import sys
 import re
-from collections import defaultdict
+import shlex
+from collections import OrderedDict
 
 _IDENTIFIER_PATTERN = '[a-zA-Z][_a-zA-Z0-9]*'
 _SQUOTE_RE = re.compile("'([^']*)'\Z") # NO squotes inside
@@ -30,43 +32,116 @@ class InvalidConfigError(Exception):
         )
 
 
-def read_vexrc(full_path, environ=None):
-    """Read and parse a .vexrc file.
+class Vexrc(object):
+    """Parsed representation of a .vexrc config file.
     """
-    headings = defaultdict(dict)
-    headings[None] = {}
-    errors = []
-    environ = environ or {}
+    default_heading = "root"
+    default_encoding = "utf-8"
 
-    try:
-        inp = open(full_path, 'rb')
-    except FileNotFoundError:
-        return headings
+    def __init__(self):
+        self.encoding = self.default_encoding
+        self.headings = OrderedDict()
+        self.headings[self.default_heading] = OrderedDict()
+        self.headings['env'] = OrderedDict()
+
+    def __getitem__(self, key):
+        return self.headings.get(key)
+
+    @classmethod
+    def from_file(cls, path, environ):
+        instance = cls()
+        instance.read(path, environ)
+        return instance
+
+    def read(self, path, environ):
+        try:
+            inp = open(path, 'rb')
+        except FileNotFoundError:
+            return None
+        parsing = parse_vexrc(inp, environ)
+        for heading, key, value in parsing:
+            heading = self.default_heading if heading is None else heading
+            if heading not in self.headings:
+                self.headings[heading] = OrderedDict()
+            self.headings[heading][key] = value
+        parsing.close()
+
+    def get_ve_base(self, environ):
+        """Find a directory to look for virtualenvs in.
+        """
+        # set ve_base to a path we can look for virtualenvs:
+        # 1. .vexrc
+        # 2. WORKON_HOME (as defined for virtualenvwrapper's benefit)
+        # 3. $HOME/.virtualenvs
+        # (unless we got --path, then we don't need it)
+        ve_base = self.headings[self.default_heading].get('virtualenvs')
+        if ve_base:
+            ve_base = os.path.expanduser(ve_base)
+        else:
+            ve_base = environ.get('WORKON_HOME')
+        if not ve_base:
+            home = environ.get('HOME', None)
+            if not home:
+                return None
+            ve_base = os.path.join(home, '.virtualenvs')
+        return ve_base
+
+    def get_shell(self, environ):
+        """Find a command to run.
+        """
+        command = self.headings[self.default_heading].get('shell')
+        command = command or environ.get('SHELL')
+        # TODO: ow to deal coherently with multiword strings
+        command = shlex.split(command) if command else None
+        # command = command.split() if command else None
+        # command = [command] if command else None
+        return command
+
+
+def extract_heading(line):
+    match = _HEADING_RE.match(line)
+    if match:
+        return match.group(1)
+    return None
+
+
+def extract_key_value(line, environ):
+    segments = line.split("=", 1)
+    if len(segments) < 2:
+        return None
+    key, value = segments
+    # foo passes through as-is (with spaces stripped)
+    # '{foo}' passes through literally
+    # "{foo}" substitutes from environ's foo
+    value = value.strip()
+    if value[0] == "'" and _SQUOTE_RE.match(value):
+        value = value[1:-1]
+    elif value[0] == '"' and _DQUOTE_RE.match(value):
+        template = value[1:-1]
+        value = template.format(**environ)
+    key = key.strip()
+    value = value.strip()
+    return key, value
+
+
+def parse_vexrc(inp, environ):
+    heading = None
+    errors = []
     with inp:
-        heading = None
-        for i, line in enumerate(inp):
-            line = line.decode('utf-8')
-            match = _HEADING_RE.match(line)
-            if match:
-                heading = match.group(1)
+        for line_number, line in enumerate(inp):
+            line = line.decode("utf-8")
+            extracted_heading = extract_heading(line)
+            if extracted_heading is not None:
+                heading = extracted_heading
                 continue
-            segments = line.split("=", 1)
-            if len(segments) == 2:
-                key, value = segments
-                value = value.strip()
-                # foo passes through as-is (with spaces stripped)
-                # '{foo}' passes through literally
-                # "{foo}" substitutes from environ's foo
-                if value[0] == "'" and _SQUOTE_RE.match(value):
-                    value = value[1:-1]
-                elif value[0] == '"' and _DQUOTE_RE.match(value):
-                    template = value[1:-1]
-                    value = template.format(**environ)
-                key = key.strip()
-                value = value.strip()
-                headings[heading][key] = value
+            kv = extract_key_value(line, environ)
+            if kv is None:
+                errors.append((line_number, line))
                 continue
-            errors.append((i, line))
+            key, value = kv
+            try:
+                yield heading, key, value
+            except GeneratorExit:
+                break
     if errors:
         raise InvalidConfigError(errors)
-    return headings

@@ -5,7 +5,7 @@ import os
 import argparse
 import textwrap
 from vex import config
-from vex.run import get_ve_base, get_command, make_env, run
+from vex.run import make_env, run
 
 
 def _barf(message):
@@ -13,6 +13,13 @@ def _barf(message):
     """
     sys.stdout.write("Error: " + message + '\n')
     sys.exit(1)
+
+
+def get_command(options, vexrc, environ):
+    command = options.rest
+    if not command:
+        command = vexrc.get_shell(environ)
+    return command
 
 
 def make_arg_parser():
@@ -61,8 +68,8 @@ def main_logic(environ, argv):
         arg_parser.print_help()
         return _barf("unknown args: {0!r}".format(unknown))
 
-    vexrc = config.read_vexrc(options.config, environ)
-    ve_base = get_ve_base(vexrc)
+    vexrc = config.Vexrc.from_file(options.config, environ)
+    ve_base = vexrc.get_ve_base(environ)
     if not options.path and not ve_base:
         return _barf(
             "could not figure out a virtualenvs directory. "
@@ -93,7 +100,7 @@ def main_logic(environ, argv):
     options.path = ve_path
     options.virtualenv = ve_name
 
-    command = get_command(options, vexrc)
+    command = get_command(options, vexrc, environ)
     if not command:
         return _barf("no command")
     env = make_env(environ, vexrc['env'], options)
