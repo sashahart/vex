@@ -28,15 +28,22 @@ def make_env(environ, defaults, options):
         del env['PYTHONHOME']
 
     # Now we have to adjust PATH to find scripts for the virtualenv...
-    path = environ.get('PATH', None)
-    assert path
-    assert options.path
+    # PATH being unset/empty is OK, but options.path must be set
+    # or there is nothing for us to do here and it's bad.
+    path = environ.get('PATH', '')
+    if not options.path:
+        error('options.path must be set')
+        return None
     ve_bin = os.path.join(options.path, 'bin')
-    assert ve_bin
+    if not ve_bin:
+        error('ve_bin must be set')
+        return None
 
     # I don't expect this to fail, but I'd rather be slightly paranoid and fail
     # early before putting a nonexistent path on PATH.
-    assert os.path.exists(ve_bin), "ve_bin %r does not exist" % ve_bin
+    if not os.path.exists(ve_bin):
+        error('ve_bin %r does not exist' % ve_bin)
+        return None
 
     # If user is currently in a virtualenv, DON'T just prepend
     # to its path (vex foo; echo $PATH -> " /foo/bin:/bar/bin")
