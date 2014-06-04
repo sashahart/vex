@@ -15,8 +15,6 @@ def _barf(message):
     sys.exit(1)
 
 
-def main():
-    """The main command-line entry point.
 def make_arg_parser():
     """Return a standard ArgumentParser object.
     """
@@ -53,10 +51,12 @@ def make_arg_parser():
     return parser
 
 
+def main_logic(environ, argv):
+    """Logic for main(), without the direct system interactions.
     """
     # Get options, complain if any unknown stuff crept in
     arg_parser = make_arg_parser()
-    options, unknown = arg_parser.parse_known_args(sys.argv[1:])
+    options, unknown = arg_parser.parse_known_args(argv)
     if unknown:
         arg_parser.print_help()
         return _barf("unknown args: {0!r}".format(unknown))
@@ -96,8 +96,16 @@ def make_arg_parser():
     command = get_command(options, vexrc)
     if not command:
         return _barf("no command")
-    env = make_env(os.environ, vexrc['env'], options)
+    env = make_env(environ, vexrc['env'], options)
     returncode = run(command, env=env, cwd=options.cwd)
     if returncode is None:
         return _barf("command not found: {0!r}".format(command[0]))
+    return returncode
+
+
+def main():
+    """The main command-line entry point, with system interactions.
+    """
+    argv = sys.argv[1:]
+    returncode = main_logic(os.environ, argv)
     sys.exit(returncode)
