@@ -164,6 +164,14 @@ If you want to use a config someplace other than ``~/.vexrc``::
     vex --config ~/.tempvexrc foo bash
 
 
+Shell Prompts
+=============
+
+This section gives some simple examples of how you could customize your shell
+to reflect the current virtualenv, since vex intentionally does not mess with
+your shell's prompt (in order to stay shell-agnostic).
+
+
 Caveats
 =======
 
