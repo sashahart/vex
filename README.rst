@@ -218,6 +218,22 @@ Here is something you can start from in ~/.kshrc:
 This should also work for mksh in ~/.mkshrc.
 
 
+fish
+----
+
+Here is some code you could put into `~/.config/fish/functions/fish_prompt.fish`.
+
+.. code-block:: fish
+
+    function fish_prompt
+        if test -n "$VIRTUAL_ENV"
+            set -l ve_tag (basename "$VIRTUAL_ENV")
+            echo -n (set_color green)"($ve_tag) "(set_color normal)
+        end
+        printf '%s@%s %s%s%s> ' (whoami) (hostname|cut -d . -f 1) (set_color $fish_color_cwd) (prompt_pwd) (set_color normal)
+    end
+
+
 tcsh
 ----
 
@@ -233,6 +249,7 @@ $VIRTUAL_ENV yourself.
         set VIRTUAL_ENV=""
     endif
     set prompt="`if ( "$VIRTUAL_ENV" != "" ) basename $VIRTUAL_ENV`|%N@%m:%~%# "
+
 
 Caveats
 =======
