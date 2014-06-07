@@ -1,5 +1,8 @@
 from setuptools import setup
 
+with open('README.rst', 'r') as inp:
+    long_description = inp.read()
+
 setup(
     name="vex",
     version="0.0.0",
@@ -8,6 +11,7 @@ setup(
     url="http://github.com/sashahart/vex",
     description="Run commands in a virtualenv",
     license="MIT",
+    long_description=long_description,
     keywords="virtualenv virtualenvwrapper workon installation deployment",
     install_requires=['virtualenv'],
     packages=['vex'],
