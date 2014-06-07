@@ -58,26 +58,26 @@ Examples
 vex should work with most commands you can think of. 
 Try it out. 
 
-vex foo bash
+``vex foo bash``
     Launch a bash shell with virtualenv foo activated in it.
     To deactivate, just exit the shell (using "exit" or Ctrl-D).
 
-vex foo python
+``vex foo python``
     Launch a Python interpreter inside virtualenv foo.
 
-vex foo which python
+``vex foo which python``
     Verify the path to python from inside virtualenv foo.
 
-vex foo pip freeze
+``vex foo pip freeze``
     See what's installed in virtualenv foo.
 
-vex foo pip install ipython
+``vex foo pip install ipython``
     Install ipython inside virtualenv foo.
 
-vex foo ipython
+``vex foo ipython``
     Launch the ipython interpreter you have installed inside virtualenv foo.
 
-vex foo
+``vex foo``
     Launch your shell (as specified in SHELL or ~/.vexrc) in virtualenv foo
     (this is like a direct replacement for 'workon').
 
@@ -168,7 +168,7 @@ your shell's prompt (in order to stay shell-agnostic).
 bash
 ----
 
-Here is an example of what you could put in ~/.bashrc:
+Here is an example of what you could put in ``~/.bashrc``:
 
 .. code-block:: bash
 
@@ -184,9 +184,8 @@ Here is an example of what you could put in ~/.bashrc:
 zsh
 ---
 
-Here is an example of what you could put in ~/.zshrc:
+Here is an example of what you could put in ``~/.zshrc``:
 
-.. code-block:: zsh
 
     # zsh needs this option set to use $(virtualenv_prompt)
     setopt prompt_subst
@@ -214,7 +213,7 @@ This should also work for mksh in ~/.mkshrc.
 fish
 ----
 
-Here is some code you could put into `~/.config/fish/functions/fish_prompt.fish`.
+Here is some code you could put into ``~/.config/fish/functions/fish_prompt.fish``.
 
 .. code-block:: fish
 
