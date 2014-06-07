@@ -269,6 +269,14 @@ bash
 
    eval "$(vex --shell-config bash)"
 
+zsh
+---
+
+.. code-block:: zsh
+
+   eval "$(vex --shell-config zsh)"
+
+
 
 Caveats
 =======
