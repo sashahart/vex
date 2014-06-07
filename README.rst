@@ -251,6 +251,19 @@ $VIRTUAL_ENV yourself.
     set prompt="`if ( "$VIRTUAL_ENV" != "" ) basename $VIRTUAL_ENV`|%N@%m:%~%# "
 
 
+Shell Completion
+================
+
+vex provides a completely optional mechanism to set up
+completion of the 'vex' command for several popular shells.
+
+Since completion requires a modification of the current shell
+state, and vex refuses to do this, it can be done by having the shell
+evaluate some lines emitted by vex.
+
+If you use these, use them EXACTLY as described here.
+
+
 Caveats
 =======
 
