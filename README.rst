@@ -277,6 +277,14 @@ zsh
    eval "$(vex --shell-config zsh)"
 
 
+fish
+----
+
+.. code-block:: fish
+
+    . (vex --shell-config fish|psub)
+
+
 
 Caveats
 =======
