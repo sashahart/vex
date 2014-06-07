@@ -7,8 +7,8 @@ import shlex
 from collections import OrderedDict
 
 _IDENTIFIER_PATTERN = '[a-zA-Z][_a-zA-Z0-9]*'
-_SQUOTE_RE = re.compile("'([^']*)'\Z") # NO squotes inside
-_DQUOTE_RE = re.compile('"([^"]*)"\Z') # NO dquotes inside
+_SQUOTE_RE = re.compile("'([^']*)'\Z")  # NO squotes inside
+_DQUOTE_RE = re.compile('"([^"]*)"\Z')  # NO dquotes inside
 _HEADING_RE = re.compile(
     r'^(' + _IDENTIFIER_PATTERN + r'):[ \t\n\r]*\Z')
 _VAR_RE = re.compile(
@@ -76,17 +76,17 @@ class Vexrc(object):
         # 2. WORKON_HOME (as defined for virtualenvwrapper's benefit)
         # 3. $HOME/.virtualenvs
         # (unless we got --path, then we don't need it)
-        ve_base = self.headings[self.default_heading].get('virtualenvs')
-        if ve_base:
-            ve_base = os.path.expanduser(ve_base)
+        ve_base_value = self.headings[self.default_heading].get('virtualenvs')
+        if ve_base_value:
+            ve_base = os.path.expanduser(ve_base_value)
         else:
-            ve_base = environ.get('WORKON_HOME')
+            ve_base = environ.get('WORKON_HOME', '')
         if not ve_base:
-            home = environ.get('HOME', None)
+            home = environ.get('HOME', '')
             if not home:
                 return None
             ve_base = os.path.join(home, '.virtualenvs')
-        return ve_base
+        return ve_base or None
 
     def get_shell(self, environ):
         """Find a command to run.

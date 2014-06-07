@@ -22,7 +22,7 @@ def make_env(environ, defaults, options):
     """Make an environment to run with.
     """
     # Copy the parent environment, add in defaults from .vexrc.
-    env = os.environ.copy()
+    env = environ.copy()
     env.update(defaults)
 
     # Leaving in existing PYTHONHOME can cause some errors
@@ -32,7 +32,6 @@ def make_env(environ, defaults, options):
     # Now we have to adjust PATH to find scripts for the virtualenv...
     # PATH being unset/empty is OK, but options.path must be set
     # or there is nothing for us to do here and it's bad.
-    path = environ.get('PATH', '')
     if not options.path:
         error('options.path must be set')
         return None
@@ -55,18 +54,18 @@ def make_env(environ, defaults, options):
     # This would not be necessary and things would be simpler if vex
     # did not have to interoperate with a ubiquitous existing tool.
     # virtualenv doesn't...
-    current_ve = env.get('VIRTUAL_ENV')
+    current_ve = env.get('VIRTUAL_ENV', '')
+    system_path = environ.get('PATH', '')
+    segments = system_path.split(os.pathsep)
     if current_ve:
         # Since activate doesn't export _OLD_VIRTUAL_PATH, we are going to
         # manually remove the virtualenv's bin.
         # A virtualenv's bin should not normally be on PATH except
         # via activate or similar, so I'm OK with this solution.
         current_ve_bin = os.path.join(current_ve, 'bin')
-        segments = path.split(os.pathsep)
         segments.remove(current_ve_bin)
-        path = os.pathsep.join(segments)
-
-    env['PATH'] = os.pathsep.join([ve_bin, path])
+    segments.insert(0, ve_bin)
+    env['PATH'] = os.pathsep.join(segments)
     env['VIRTUAL_ENV'] = options.path
     return env
 

@@ -3,7 +3,6 @@
 import sys
 import os
 import argparse
-import textwrap
 from vex import config
 from vex.run import make_env, run
 
@@ -84,19 +83,31 @@ def main_logic(environ, argv):
     if ve_path:
         ve_name = os.path.basename(os.path.normpath(ve_path))
     else:
-        ve_name = options.rest.pop(0) if options.rest else None
+        ve_base = vexrc.get_ve_base(environ)
+        if not ve_base:
+            return _barf(
+                "could not figure out a virtualenvs directory. "
+                "make sure $HOME is set, or $WORKON_HOME,"
+                " or set virtualenvs=something in your .vexrc")
+        if not os.path.exists(ve_base):
+            return _barf("virtualenvs directory {0!r} not found."
+                         .format(ve_base))
+        ve_name = options.rest.pop(0) if options.rest else ''
         if not ve_name:
             _barf("could not find a virtualenv name in the command line.")
             arg_parser.print_help()
             return 1
         ve_path = os.path.join(ve_base, ve_name)
+        assert ve_name != ve_path
+
+    # Sanity check the above work since it's a bit complicated
+    # and consequences of empty arguments to path functions can be dire
     assert ve_path
-    assert isinstance(ve_path, str)
+    assert ve_name
+
     ve_path = os.path.abspath(ve_path)
-    if not ve_name:
-        ve_name = os.path.basename(os.path.normpath(ve_path))
     if not os.path.exists(ve_path):
-        return _barf("virtualenv not found at {0!r}.".format(ve_path))
+        return _barf("no virtualenv found at {0!r}.".format(ve_path))
     options.path = ve_path
     options.virtualenv = ve_name
 
