@@ -1,0 +1,75 @@
+function __vex_positional_args
+	# Count the arguments which don't start with a dash.
+	# n.b.: This does not account for arguments to options!
+	commandline -poc | grep '^[^-]'
+end
+
+function __vex_optional_args
+	# Count the arguments which do start with a dash.
+	commandline -poc | grep '^[-]'
+end
+
+function __vex_needs_virtualenv
+  # Return 0 if we should expect a virtualenv arg.
+  # This is normally if there were no positional args after 'vex'.
+  # But we also don't need it if we already saw --path.
+  set args (__vex_positional_args)
+  set opts (__vex_optional_args)
+  for opt in $opts
+	if [ $opt = '--path' ]
+		return 1
+	end
+  end
+  if [ (count $args) -eq 1 -a $args[1] = 'vex' ]
+    return 0
+  end
+  return 1
+end
+
+function __vex_needs_command
+  # Return 0 if we can expect the start of a command.
+  # This is normally just if there were two positional args,
+  # which happily includes the mandatory argument to --path.
+  set cmd (__vex_positional_args)
+  if [ (count $cmd) -eq 2 -a $cmd[1] = 'vex' ]
+    return 0
+  end
+  return 1
+end
+
+function __vex_list_virtualenvs
+    # echo the names of virtualenvs available as 'vex VENVNAME'.
+	set dirs (find "$WORKON_HOME" -maxdepth 2 -name "bin" -type d -not -empty -printf '%h\n')
+	for NAME in $dirs
+		basename $NAME
+	end
+end
+
+function __vex_list_commands
+    # echo the names of executables available in the previously-named
+    # virtualenv, and otherwise just complete the current token
+    set cmd (__vex_positional_args)
+	if [ (count $cmd) -eq 2 -a $cmd[1] = 'vex' ]
+	    set ve "$WORKON_HOME/$cmd[2]"
+	    if test -f "$ve/bin"
+			find "$ve/bin" -maxdepth 1 -executable -printf '%f\n'
+		end
+	end
+	set -l ctoken (commandline -ct)
+	complete -C$ctoken
+end
+
+# If we source this, we want to wipe out previously defined vex completions
+complete -e -c vex
+# Two positional arguments, a virtualenv and a command.
+complete -c vex -n "__vex_needs_virtualenv" -d "Virtualenv" -f -a "(__vex_list_virtualenvs)" 
+complete -c vex -n "__vex_needs_command" -d "Command from Virtualenv" -x -a "(__vex_list_commands)"
+# Other options.
+complete -c vex -l help -s h -n "__fish_no_arguments" -d "print help information"
+complete -c vex -l path -x -a "(__fish_complete_directories)" -d "Give absolute path to virtualenv"
+complete -c vex -l cwd -x -a "(__fish_complete_directories)" -d "Give directory to run in"
+complete -c vex -l config -r -a "" -d "Give path to vexrc file"
+complete -c vex -l shell-config -r -a "fish zsh bash" -d "print evaluable shell config"
+
+# any switches on the end - no clear way to stop the processing!
+#complete -c vex -u
