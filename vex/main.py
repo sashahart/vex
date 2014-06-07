@@ -2,7 +2,8 @@
 """
 import sys
 import os
-from vex import args
+import argparse
+import textwrap
 from vex import config
 from vex.run import get_ve_base, get_command, make_env, run
 
@@ -16,9 +17,45 @@ def _barf(message):
 
 def main():
     """The main command-line entry point.
+def make_arg_parser():
+    """Return a standard ArgumentParser object.
+    """
+    parser = argparse.ArgumentParser(
+        formatter_class=argparse.RawTextHelpFormatter,
+        usage="vex [OPTIONS] VIRTUALENV_NAME COMMAND_TO_RUN ...",
+    )
+
+    parser.add_argument(
+        "--path",
+        metavar="DIR",
+        help="absolute path to virtualenv to use",
+        action="store"
+    )
+    parser.add_argument(
+        '--cwd',
+        metavar="DIR",
+        action="store",
+        default='.',
+        help="path to run command in (default: '.' aka $PWD)",
+    )
+    parser.add_argument(
+        "--config",
+        metavar="FILE",
+        default=os.path.expanduser('~/.vexrc'),
+        action="store",
+        help="path to config file to read (default: '~/.vexrc')"
+    )
+    parser.add_argument(
+        "rest",
+        nargs=argparse.REMAINDER,
+        help=argparse.SUPPRESS)
+
+    return parser
+
+
     """
     # Get options, complain if any unknown stuff crept in
-    arg_parser = args.make_arg_parser()
+    arg_parser = make_arg_parser()
     options, unknown = arg_parser.parse_known_args(sys.argv[1:])
     if unknown:
         arg_parser.print_help()
@@ -36,10 +73,11 @@ def main():
 
     # Find a virtualenv path
     ve_path = options.path
-    ve_name = options.virtualenv
-    if not ve_path:
-        if not ve_name:
-            ve_name = options.rest.pop(0) if options.rest else None
+    ve_name = None
+    if ve_path:
+        ve_name = os.path.basename(os.path.normpath(ve_path))
+    else:
+        ve_name = options.rest.pop(0) if options.rest else None
         if not ve_name:
             _barf("could not find a virtualenv name in the command line.")
             arg_parser.print_help()
