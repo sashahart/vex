@@ -73,6 +73,9 @@ def make_env(environ, defaults, options):
 def run(command, env, cwd):
     """Run the given command.
     """
+    assert command
+    if cwd:
+        assert os.path.exists(cwd)
     try:
         process = subprocess.Popen(command, env=env, cwd=cwd)
         process.wait()

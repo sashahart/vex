@@ -117,6 +117,11 @@ def main_logic(environ, argv):
     options.path = ve_path
     options.virtualenv = ve_name
 
+    if options.cwd:
+        if not os.path.exists(options.cwd):
+            return _barf(
+                "can't --cwd to invalid path {0!r}".format(options.cwd))
+
     command = get_command(options, vexrc, environ)
     if not command:
         return _barf("no command")
