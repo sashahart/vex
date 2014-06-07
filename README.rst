@@ -261,12 +261,17 @@ If you use these, use them EXACTLY as described here.
 
 bash
 ----
+
+This could be put in, e.g., ``~/.bashrc``.
+
 .. code-block:: bash
 
    eval "$(vex --shell-config bash)"
 
 zsh
 ---
+
+This could be put in, e.g., ``~/.zshrc``.
 
 .. code-block:: bash
 
@@ -275,6 +280,8 @@ zsh
 
 fish
 ----
+
+This could be put in, e.g., ``~/.config/fish/config.fish``.
 
 .. code-block:: text
 
