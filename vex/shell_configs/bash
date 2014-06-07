@@ -1,0 +1,61 @@
+_vex_virtualenvs () {
+	for f in "$WORKON_HOME"/*; do
+		[ -d "$f" ] && basename $f
+	done
+}
+
+_vex_position() {
+	local take_args='--config|--path|--cwd'
+	local i cur prev count=0
+	for ((i=1; $i<=$COMP_CWORD; i++)); do
+		cur="${COMP_WORDS[i]}"
+		if [[ "${cur}" != -* ]]; then
+			if [[ "${prev}" != @($take_args) ]]; then
+				count=$(($count + 1))
+			fi
+		fi
+		prev="${cur}"
+	done
+	echo $count
+}
+
+_vex() {
+	local prev cur flags
+	COMPREPLY=()
+	cur="$2"
+	prev="$3"
+	position="$(_vex_position)"
+
+	# If we're not in or after the first arg to vex, we can still
+	# help with completions of flags and args to flags.
+	if [ "${position}" -eq "0" ]; then
+		case "${prev}" in
+			--config)
+				COMPREPLY=( $(compgen -f -- "${cur}") )
+				;;
+			--path|--cwd)
+				COMPREPLY=( $(compgen -d "${cur}") )
+				;;
+			*)
+				if [[ "${cur}" == -* ]]; then
+					flags=$(vex --help | grep -P -o "(\s(-\w{1}|--[\w-]*=?)){1,2}" | \
+						   sort | uniq | grep -v "extra\-search\-dir$")
+					COMPREPLY=( $(compgen -W "${flags}" -- ${cur}) )
+				fi
+				;;
+		esac
+		return 0
+
+	# If we're apparently in the first positional arg, complete virtualenvs
+	elif [ "${position}" -eq "1" ]; then
+		COMPREPLY=( $(compgen -W "$(_vex_virtualenvs)" -- ${cur}) )
+
+	# If we already have the first positional arg, we're just making
+	# a command that runs inside the virtualenv
+	elif [ "${position}" -eq "2" ]; then
+		_command_offset 2
+	fi
+	return 0
+}
+
+complete -o bashdefault -F _vex vex
