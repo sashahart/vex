@@ -22,12 +22,14 @@ if sys.version_info < (3, 3):
 class InvalidConfigError(Exception):
     """Raised when there is an error during a .vexrc file parse.
     """
-    def __init__(self, errors):
+    def __init__(self, filename, errors):
         Exception.__init__(self)
+        self.filename = filename
         self.errors = errors
 
     def __str__(self):
-        return "errors on lines {0!r}".format(
+        return "errors in {0!r}, lines {1!r}".format(
+            self.filename,
             list(tup[0] for tup in self.errors)
         )
 
@@ -146,4 +148,4 @@ def parse_vexrc(inp, environ):
             except GeneratorExit:
                 break
     if errors:
-        raise InvalidConfigError(errors)
+        raise InvalidConfigError(inp.name, errors)
