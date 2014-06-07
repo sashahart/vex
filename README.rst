@@ -59,23 +59,23 @@ vex should work with most commands you can think of.
 Try it out. 
 
 vex foo bash
-	Launch a bash shell with virtualenv foo activated in it.
-	To deactivate, just exit the shell (using "exit" or Ctrl-D).
+    Launch a bash shell with virtualenv foo activated in it.
+    To deactivate, just exit the shell (using "exit" or Ctrl-D).
 
 vex foo python
-	Launch a Python interpreter inside virtualenv foo.
+    Launch a Python interpreter inside virtualenv foo.
 
 vex foo which python
     Verify the path to python from inside virtualenv foo.
 
 vex foo pip freeze
-	See what's installed in virtualenv foo.
+    See what's installed in virtualenv foo.
 
 vex foo pip install ipython
-	Install ipython inside virtualenv foo.
+    Install ipython inside virtualenv foo.
 
 vex foo ipython
-	Launch the ipython interpreter you have installed inside virtualenv foo.
+    Launch the ipython interpreter you have installed inside virtualenv foo.
 
 vex foo
     Launch your shell (as specified in SHELL or ~/.vexrc) in virtualenv foo
@@ -109,9 +109,6 @@ You shouldn't normally have to separately install virtualenv; pip should drag
 that in if you don't already have it.
 
 If you don't have pip, `learn to install pip <http://pip.readthedocs.org/en/latest/installing.html>`_.
-
-.. If you want to upgrade vex, you can similarly use
-..     pip install --upgrade --user vex
 
 To uninstall, just use ``pip uninstall vex -y``.
 
