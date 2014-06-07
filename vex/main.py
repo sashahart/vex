@@ -11,7 +11,7 @@ from vex.run import make_env, run
 def _barf(message):
     """Standard way of reporting an error and bailing.
     """
-    sys.stdout.write("Error: " + message + '\n')
+    sys.stderr.write("Error: " + message + '\n')
     sys.exit(1)
 
 
