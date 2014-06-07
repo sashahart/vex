@@ -5,10 +5,10 @@ Run a command in the named virtualenv.
 
 vex is an alternative to virtualenv's ``source wherever/bin/activate``
 and ``deactivate``, and virtualenvwrapper's ``workon``, and also
-virtualenv-burrito if you use that. 
+virtualenv-burrito if you use that.
 It works in a more elegant way, though it does less.
 You might find it nicer to use.
-And it works with non-bash shells. 
+And it works with non-bash shells.
 
 (It doesn't make or remove virtualenvs, though. Should it?)
 
@@ -23,7 +23,7 @@ To know why this is different, you have to understand a little about how
 virtualenv normally works.
 The normal way people use a virtualenv (other than virtualenvwrapper,
 which does this for them) is to open a shell and source
-a file called ``whatever/bin/activate``. 
+a file called ``whatever/bin/activate``.
 Sourcing this shell script modifies the environment in the current shell.
 It saves the old values and sets up a shell function named ``deactivate``
 which restores those old values. When you run ``deactivate`` it restores
@@ -55,8 +55,8 @@ an example with bash, it works the same with anything.
 Examples
 ========
 
-vex should work with most commands you can think of. 
-Try it out. 
+vex should work with most commands you can think of.
+Try it out.
 
 ``vex foo bash``
     Launch a bash shell with virtualenv foo activated in it.
@@ -164,6 +164,9 @@ This section gives some simple examples of how you could customize your shell
 to reflect the current virtualenv, since vex intentionally does not mess with
 your shell's prompt (in order to stay shell-agnostic).
 
+Don't put these in ``~/.vexrc``, that won't do anything!
+If you don't know what you're doing, use the suggested filenames.
+
 
 bash
 ----
@@ -258,6 +261,8 @@ state, and vex refuses to do this, it can be done by having the shell
 evaluate some lines emitted by vex.
 
 If you use these, use them EXACTLY as described here.
+For example, omitting quotes may have confusing results.
+And don't put these in ``~/.vexrc``, that won't do anything!
 
 bash
 ----
