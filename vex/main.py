@@ -83,15 +83,6 @@ def main_logic(environ, argv):
             options.shell_to_configure, vexrc, environ)
         return 0
 
-    ve_base = vexrc.get_ve_base(environ)
-    if not options.path and not ve_base:
-        return _barf(
-            "could not figure out a virtualenvs directory. "
-            "make sure $HOME is set, or $WORKON_HOME,"
-            " or set virtualenvs=something in your .vexrc")
-    if not os.path.exists(ve_base):
-        return _barf("virtualenvs directory {0!r} not found.".format(ve_base))
-
     # Find a virtualenv path
     ve_path = options.path
     ve_name = None
