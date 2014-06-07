@@ -263,6 +263,12 @@ evaluate some lines emitted by vex.
 
 If you use these, use them EXACTLY as described here.
 
+bash
+----
+.. code-block:: bash
+
+   eval "$(vex --shell-config bash)"
+
 
 Caveats
 =======
