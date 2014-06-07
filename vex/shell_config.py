@@ -8,7 +8,22 @@ import os
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
 
+_BASH_CONFIG = b""
+with open(os.path.join(_HERE, 'shell_configs', 'bash'), 'rb') as inp:
+    _BASH_CONFIG = inp.read()
+
+
+def bash_config(out, vexrc, environ):
+    ve_base = vexrc.get_ve_base(environ).encode('ascii')
+    if ve_base:
+        data =_BASH_CONFIG.replace(b'$WORKON_HOME', ve_base)
+    else:
+        data = _BASH_CONFIG
+    out.write(data)
+
+
 _SHELLS = {
+    'bash': bash_config,
 }
 
 
