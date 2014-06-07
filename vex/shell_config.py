@@ -15,5 +15,8 @@ _SHELLS = {
 def emit_shell_config_for(shell, vexrc, environ):
     function = _SHELLS.get(shell)
     if function:
-        out = sys.stdout.buffer
+        if hasattr(sys.stdout, 'buffer'):
+            out = sys.stdout.buffer
+        else:
+            out = sys.stdout
         function(out, vexrc, environ)
