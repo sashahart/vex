@@ -186,6 +186,7 @@ zsh
 
 Here is an example of what you could put in ``~/.zshrc``:
 
+.. code-block:: bash
 
     # zsh needs this option set to use $(virtualenv_prompt)
     setopt prompt_subst
@@ -215,7 +216,7 @@ fish
 
 Here is some code you could put into ``~/.config/fish/functions/fish_prompt.fish``.
 
-.. code-block:: fish
+.. code-block:: text
 
     function fish_prompt
         if test -n "$VIRTUAL_ENV"
@@ -264,7 +265,7 @@ bash
 zsh
 ---
 
-.. code-block:: zsh
+.. code-block:: bash
 
    eval "$(vex --shell-config zsh)"
 
@@ -272,7 +273,7 @@ zsh
 fish
 ----
 
-.. code-block:: fish
+.. code-block:: text
 
     . (vex --shell-config fish|psub)
 
@@ -296,7 +297,7 @@ your virtualenv. Safe sudo policy often controls the environment, notably as
 a default on Debian and Ubuntu. It's better not to mess with this policy,
 especially if you knew little enough that you wondered why it didn't work.
 As a workaround, you can use this::
-    
+
     sudo env PATH="$PATH" vex foo bash
 
 vex should not be noticeably slow to mere mortals, but if you run it a million
@@ -332,6 +333,6 @@ even before vex gets it or can pass it to the subprocess. You could quote it::
 but then it literally prints $VIRTUAL_ENV, not the shell evaluation of the
 variable, because that isn't the job of vex. That's a job for bash to do.
 
-.. code-block::
+.. code-block:: bash
 
     vex foo bash -c 'echo $VIRTUAL_ENV'
