@@ -17,6 +17,12 @@ with open(os.path.join(_HERE, 'shell_configs', 'zsh'), 'rb') as inp:
     _ZSH_CONFIG = inp.read()
 
 
+_FISH_CONFIG = b""
+with open(os.path.join(_HERE, 'shell_configs', 'fish'), 'rb') as inp:
+    _FISH_CONFIG = inp.read()
+
+
+
 def zsh_config(out, vexrc, environ):
     ve_base = vexrc.get_ve_base(environ).encode('ascii')
     if ve_base:
@@ -35,9 +41,19 @@ def bash_config(out, vexrc, environ):
     out.write(data)
 
 
+def fish_config(out, vexrc, environ):
+    ve_base = vexrc.get_ve_base(environ).encode('ascii')
+    if ve_base:
+        data =_FISH_CONFIG.replace(b'$WORKON_HOME', ve_base)
+    else:
+        data = _FISH_CONFIG
+    out.write(data)
+
+
 _SHELLS = {
     'bash': bash_config,
     'zsh': zsh_config,
+    'fish': fish_config,
 }
 
 
