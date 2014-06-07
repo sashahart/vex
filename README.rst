@@ -89,10 +89,6 @@ pieces left over.
 How to install vex
 ==================
 
-NOTE: RIGHT NOW THIS DOES NOT INSTALL WITH PIP/PYPI BECAUSE IT HAS NOT BEEN
-PUSHED TO PYPI. IT NEEDS SOME CLEANUPS AND A DECENT TEST SUITE BEFORE THAT WILL
-HAPPEN.
-
 You can just 'pip install vex,' but for convenience it's recommended to install
 vex with the user scheme as follows::
 
