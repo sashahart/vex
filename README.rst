@@ -44,7 +44,7 @@ environment of the new process, and those environment settings just go away
 when the process does. So no ``deactivate`` or restoration of environment is
 necessary.
 
-For example, if you run ``vex bash`` then that bash shell has the right
+For example, if you run ``vex foo bash`` then that bash shell has the right
 environment setup, but specifically "deactivating the virtualenv" is
 unnecessary; the virtualenv "deactivates" when the process ends,
 e.g. if you use ``exit`` or Ctrl-D as normal to leave bash. That's just
