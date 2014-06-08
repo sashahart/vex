@@ -39,7 +39,8 @@ def test_make_env():
 
 def test_run():
     # mock subprocess.Popen because we are cowards
-    with PatchedModule(subprocess, Popen=FakePopen(returncode=888)) as mod:
+    with PatchedModule(os.path, exists=lambda path: True), \
+       PatchedModule(subprocess, Popen=FakePopen(returncode=888)) as mod:
         assert not mod.Popen.waited
         command = 'foo'
         env = {'this': 'irrelevant'}
