@@ -1,120 +1,15 @@
 from __future__ import unicode_literals
 import os
 import sys
-import tempfile
-import shutil
 from threading import Timer
 from subprocess import Popen, PIPE
+from vex.tests import path_type
+from vex.tests.tempdir import TempDir, EmptyTempDir
+from vex.tests.tempvenv import TempVenv
+from vex.tests.tempvexrcfile import TempVexrcFile
 
 if sys.version_info < (3, 0):
     FileNotFoundError = OSError
-
-try:
-    unicode
-    str_type = unicode
-except NameError:
-    str_type = str
-
-
-path_type = bytes
-
-
-class TempVexrcFile(object):
-    def __init__(self, path, virtualenvs=None):
-        assert isinstance(path, path_type)
-        self.path = path
-        self.virtualenvs = virtualenvs
-        self.file_path = None
-        self.open()
-
-    def open(self):
-        file_path = os.path.join(self.path, b'.vexrc')
-        assert isinstance(file_path, path_type)
-        with open(file_path, 'wb') as out:
-            if self.virtualenvs:
-                assert not isinstance(self.virtualenvs, bytes)
-                line = ("virtualenvs=%s\n" % self.virtualenvs)
-                out.write(line.encode('utf-8'))
-        assert os.path.exists(file_path)
-        self.file_path = file_path
-
-    def close(self):
-        if self.file_path:
-            os.remove(self.file_path)
-
-    def __enter__(self):
-        pass
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        self.close()
-
-
-class TempDir(object):
-    def __init__(self):
-        self.path = None
-        self.open()
-
-    def __enter__(self):
-        return self
-
-    def _sanity(self):
-        assert isinstance(self.path, path_type)
-        assert b'..' not in self.path
-        assert self.path not in (b'', b'/', b'//')
-        assert os.path.exists(self.path)
-        assert os.path.isdir(self.path)
-
-    def open(self):
-        self.path = tempfile.mkdtemp().encode('utf-8')
-        self._sanity()
-
-    def close(self):
-        self._sanity()
-        shutil.rmtree(self.path)
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        self.close()
-
-
-class EmptyTempDir(TempDir):
-    def close(self):
-        self._sanity()
-        os.rmdir(self.path)
-
-
-class TempVenv(object):
-    def __init__(self, parent, name, args):
-        assert isinstance(parent, path_type)
-        assert isinstance(name, str_type)
-        assert os.path.abspath(parent) == parent
-        self.parent = parent
-        self.name = name
-        self.args = args or []
-        self.path = os.path.join(parent, name.encode('utf-8'))
-        self.open()
-
-    def open(self):
-        assert isinstance(self.parent, path_type)
-        assert os.path.exists(self.parent)
-        args = ['virtualenv', '--quiet', self.path] + self.args
-        if not os.path.exists(self.path):
-            process = Popen(args)
-            process.wait()
-            assert process.returncode == 0
-        assert os.path.exists(self.path)
-        bin_path = os.path.join(self.path, b'bin')
-        assert os.path.exists(bin_path)
-
-    def close(self):
-        if os.path.exists(self.path):
-            shutil.rmtree(self.path)
-        assert not os.path.exists(self.path)
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        self.close()
 
 
 class Run(object):
