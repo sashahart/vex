@@ -249,6 +249,9 @@ Shell Completion
 
 vex provides a completely optional mechanism to set up
 completion of the 'vex' command for several popular shells.
+This allows you to do things like hitting the 'TAB' key
+after 'vex mye' and getting it expanded to 'vex myenv'.
+(Specific features depend on the shell.)
 
 Since completion requires a modification of the current shell
 state, and vex refuses to do this, it can be done by having the shell
