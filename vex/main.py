@@ -123,6 +123,9 @@ def main_logic(environ, argv):
                 "can't --cwd to invalid path {0!r}".format(options.cwd))
 
     command = get_command(options, vexrc, environ)
+    if command and command[0].startswith('--'):
+        return _barf("don't put flags like '%s' after the virtualenv name."
+                     % command[0])
     if not command:
         return _barf("no command")
     env = make_env(environ, vexrc['env'], options)
