@@ -22,11 +22,10 @@ with open(os.path.join(_HERE, 'shell_configs', 'fish'), 'rb') as inp:
     _FISH_CONFIG = inp.read()
 
 
-
 def zsh_config(out, vexrc, environ):
     ve_base = vexrc.get_ve_base(environ).encode('ascii')
     if ve_base:
-        data =_ZSH_CONFIG.replace(b'$WORKON_HOME', ve_base)
+        data = _ZSH_CONFIG.replace(b'$WORKON_HOME', ve_base)
     else:
         data = _ZSH_CONFIG
     out.write(data)
@@ -35,7 +34,7 @@ def zsh_config(out, vexrc, environ):
 def bash_config(out, vexrc, environ):
     ve_base = vexrc.get_ve_base(environ).encode('ascii')
     if ve_base:
-        data =_BASH_CONFIG.replace(b'$WORKON_HOME', ve_base)
+        data = _BASH_CONFIG.replace(b'$WORKON_HOME', ve_base)
     else:
         data = _BASH_CONFIG
     out.write(data)
@@ -44,7 +43,7 @@ def bash_config(out, vexrc, environ):
 def fish_config(out, vexrc, environ):
     ve_base = vexrc.get_ve_base(environ).encode('ascii')
     if ve_base:
-        data =_FISH_CONFIG.replace(b'$WORKON_HOME', ve_base)
+        data = _FISH_CONFIG.replace(b'$WORKON_HOME', ve_base)
     else:
         data = _FISH_CONFIG
     out.write(data)

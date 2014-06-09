@@ -49,6 +49,7 @@ def test_read_vexrc_expand():
             'b': '{SHELL}',
         }
 
+
 def test_get_ve_base_in_vexrc():
     vexrc = config.Vexrc()
     root = vexrc.headings[vexrc.default_heading]
