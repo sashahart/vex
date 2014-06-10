@@ -79,6 +79,10 @@ def main_logic(environ, argv):
         return _barf("nonexistent config: {0!r}".format(options.config))
     options.config = options.config or os.path.expanduser('~/.vexrc')
 
+    # If asked to emit shell config, do it and bail ASAP.
+    # n.b.: We have to parse vexrc BEFORE doing emitting shell config so
+    # that we can adjust WORKON_HOME, to let virtualenv name completion
+    # search the directory given in ~/.vexrc.
     vexrc = config.Vexrc.from_file(options.config, environ)
 
     if options.shell_to_configure is not None:
