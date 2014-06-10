@@ -14,6 +14,41 @@ def _barf(message):
     sys.exit(1)
 
 
+def get_virtualenv_path(options, vexrc, environ):
+    """Find a virtualenv path.
+    """
+    ve_path = options.path
+    ve_name = None
+    if ve_path:
+        ve_name = os.path.basename(os.path.normpath(ve_path))
+    else:
+        ve_base = vexrc.get_ve_base(environ)
+        if not ve_base:
+            return _barf(
+                "could not figure out a virtualenvs directory. "
+                "make sure $HOME is set, or $WORKON_HOME,"
+                " or set virtualenvs=something in your .vexrc")
+        if not os.path.exists(ve_base):
+            return _barf("virtualenvs directory {0!r} not found."
+                         .format(ve_base))
+        ve_name = options.rest.pop(0) if options.rest else ''
+        if not ve_name:
+            return None, None
+
+        # n.b.: if ve_name is absolute, ve_base is discarded by os.path.join,
+        # and an absolute path will be accepted as first arg.
+        # So we check if they gave an absolute path as ve_name.
+        # But we don't want this error if $PWD == $WORKON_HOME,
+        # in which case 'foo' is a valid relative path to virtualenv foo.
+        ve_path = os.path.join(ve_base, ve_name)
+        if ve_path == ve_name and os.path.basename(ve_name) != ve_name:
+            return _barf(
+                'To run in a virtualenv by its path, '
+                'use "vex --path {0}"'.format(ve_path))
+
+    return ve_name, ve_path
+
+
 def get_command(options, vexrc, environ):
     command = options.rest
     if not command:
@@ -92,36 +127,11 @@ def main_logic(environ, argv):
         return 0
 
     # Find a virtualenv path
-    ve_path = options.path
-    ve_name = None
-    if ve_path:
-        ve_name = os.path.basename(os.path.normpath(ve_path))
-    else:
-        ve_base = vexrc.get_ve_base(environ)
-        if not ve_base:
-            return _barf(
-                "could not figure out a virtualenvs directory. "
-                "make sure $HOME is set, or $WORKON_HOME,"
-                " or set virtualenvs=something in your .vexrc")
-        if not os.path.exists(ve_base):
-            return _barf("virtualenvs directory {0!r} not found."
-                         .format(ve_base))
-        ve_name = options.rest.pop(0) if options.rest else ''
-        if not ve_name:
-            _barf("could not find a virtualenv name in the command line.")
-            arg_parser.print_help()
-            return 1
-        # n.b.: if ve_name is absolute, ve_base is discarded by os.path.join,
-        # and an absolute path will be accepted as first arg.
-        # So we check if they gave an absolute path as ve_name.
-        # But we don't want this error if $PWD == $WORKON_HOME,
-        # in which case 'foo' is a valid relative path to virtualenv foo.
-        ve_path = os.path.join(ve_base, ve_name)
-        if ve_path == ve_name and os.path.basename(ve_name) != ve_name:
-            return _barf(
-                'To run in a virtualenv by its path, '
-                'use "vex --path {0}"'.format(ve_path))
-        assert ve_name != ve_path
+    ve_name, ve_path = get_virtualenv_path(options, vexrc, environ)
+    if not ve_name:
+        arg_parser.print_help()
+        print()
+        return _barf("could not find a virtualenv name in the command line.")
 
     # Sanity check the above work since it's a bit complicated
     # and consequences of empty arguments to path functions can be dire
