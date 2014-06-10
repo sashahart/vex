@@ -107,7 +107,16 @@ def main_logic(environ, argv):
             _barf("could not find a virtualenv name in the command line.")
             arg_parser.print_help()
             return 1
+        # n.b.: if ve_name is absolute, ve_base is discarded by os.path.join,
+        # and an absolute path will be accepted as first arg.
+        # So we check if they gave an absolute path as ve_name.
+        # But we don't want this error if $PWD == $WORKON_HOME,
+        # in which case 'foo' is a valid relative path to virtualenv foo.
         ve_path = os.path.join(ve_base, ve_name)
+        if ve_path == ve_name and os.path.basename(ve_name) != ve_name:
+            return _barf(
+                'To run in a virtualenv by its path, '
+                'use "vex --path {0}"'.format(ve_path))
         assert ve_name != ve_path
 
     # Sanity check the above work since it's a bit complicated
