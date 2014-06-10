@@ -45,7 +45,7 @@ def make_arg_parser():
     parser.add_argument(
         "--config",
         metavar="FILE",
-        default=os.path.expanduser('~/.vexrc'),
+        default=None,
         action="store",
         help="path to config file to read (default: '~/.vexrc')"
     )
@@ -74,6 +74,10 @@ def main_logic(environ, argv):
     if unknown:
         arg_parser.print_help()
         return _barf("unknown args: {0!r}".format(unknown))
+
+    if options.config and not os.path.exists(options.config):
+        return _barf("nonexistent config: {0!r}".format(options.config))
+    options.config = options.config or os.path.expanduser('~/.vexrc')
 
     vexrc = config.Vexrc.from_file(options.config, environ)
 
