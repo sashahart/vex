@@ -95,6 +95,20 @@ def test_help():
         assert not run.err, "unexpected presence of output on stderr"
 
 
+def test_shell_config_no_arg():
+    with Run(['--shell-config'], timeout=0.5) as run:
+        run.finish()
+        assert not run.out
+        assert run.err
+
+
+def test_shell_config():
+    with Run(['--shell-config', 'bash'], timeout=0.5) as run:
+        run.finish()
+        assert run.out
+        assert not run.err
+
+
 def test_find_with_HOME():
     """Make sure we can find virtualenvs in $HOME/.virtualenvs/
     """
