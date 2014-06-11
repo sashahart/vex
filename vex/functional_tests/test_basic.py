@@ -122,6 +122,7 @@ def test_shell_config_no_arg():
         run.finish()
         assert not run.out
         assert run.err
+        assert not run.err.startswith(b'Traceback')
 
 
 def test_shell_config():
@@ -280,6 +281,7 @@ class TestWithVirtualenv(object):
         """
         with Run(["--path", self.venv.path, 'echo', 'foo']) as run:
             run.finish()
+            assert os.path.abspath(self.venv.path) == self.venv.path
             assert not run.err, "unexpected stderr output: %r" % run.err
             assert run.command_found
             assert run.returned == 0
