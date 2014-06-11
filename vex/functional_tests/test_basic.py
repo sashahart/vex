@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 import os
 import sys
+import logging
 from threading import Timer
 from subprocess import Popen, PIPE
 from vex.tests import path_type
@@ -10,6 +11,9 @@ from vex.tests.tempvexrcfile import TempVexrcFile
 
 if sys.version_info < (3, 0):
     FileNotFoundError = OSError
+
+
+logging.basicConfig(level=logging.DEBUG)
 
 
 class Run(object):
@@ -35,7 +39,7 @@ class Run(object):
         env['PATH'] = path
         try:
             args = ['vex'] + self.args
-            print("ARGS %r env %r" % (args, env))
+            logging.debug("ARGS %r env %r", args, env)
             process = Popen(
                 args, stdin=PIPE, stdout=PIPE, stderr=PIPE, env=env)
         except FileNotFoundError as error:
@@ -63,8 +67,8 @@ class Run(object):
             out, err = self.process.communicate(inp)
             self.out = out
             self.err = err
-            print("OUT %s" % out.decode('utf-8'))
-            print("ERR %s" % err.decode('utf-8'))
+            logging.debug("OUT %s", out.decode('utf-8'))
+            logging.debug("ERR %s", err.decode('utf-8'))
             self.returned = self.process.returncode
 
     def __exit__(self, exc_type, exc_value, traceback):
