@@ -104,7 +104,8 @@ class Vexrc(object):
         """Find a command to run.
         """
         command = self.headings[self.default_heading].get('shell')
-        command = command or environ.get('SHELL')
+        if not command and os.name != 'nt':
+            command = environ.get('SHELL', '')
         # TODO: ow to deal coherently with multiword strings
         command = shlex.split(command) if command else None
         # command = command.split() if command else None
