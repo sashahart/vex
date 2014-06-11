@@ -2,6 +2,7 @@
 """
 import os
 import sys
+import platform
 import subprocess
 
 if sys.version_info > (3, 3):
@@ -35,7 +36,10 @@ def get_environ(environ, defaults, ve_path):
     if not ve_path:
         error('ve_path must be set')
         return None
-    ve_bin = os.path.join(ve_path, 'bin')
+    if platform.system() == 'Windows':
+        ve_bin = os.path.join(ve_path, 'Scripts')
+    else:
+        ve_bin = os.path.join(ve_path, 'bin')
     if not ve_bin:
         error('ve_bin must be set')
         return None
