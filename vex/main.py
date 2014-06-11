@@ -7,12 +7,56 @@ from vex import config
 from vex.run import get_environ, run
 
 
-class Barf(Exception):
+class InvalidArgument(Exception):
     """Raised by anything under main() to propagate errors to user.
     """
     def __init__(self, message):
         self.message = message
         Exception.__init__(self, message)
+
+
+class NoVirtualenvsDirectory(InvalidArgument):
+    """There is no directory to find named virtualenvs in.
+    """
+    pass
+
+
+class OtherShell(InvalidArgument):
+    """The given argument to --shell-config is not recognized.
+    """
+    pass
+
+
+class UnknownArguments(InvalidArgument):
+    """Unknown arguments were given on the command line.
+
+    This is a byproduct of having to use parse_known_args.
+    """
+    pass
+
+
+class InvalidVexrc(InvalidArgument):
+    """config file specified or required but absent or unparseable.
+    """
+    pass
+
+
+class InvalidVirtualenv(InvalidArgument):
+    """No usable virtualenv was found.
+    """
+    pass
+
+
+class InvalidCommand(InvalidArgument):
+    """No runnable command was found.
+    """
+    pass
+
+
+class InvalidCwd(InvalidArgument):
+    """cwd specified or required but unusable.
+    """
+    pass
 
 
 def make_arg_parser():
@@ -69,7 +113,7 @@ def get_options(argv):
     options, unknown = arg_parser.parse_known_args(argv)
     if unknown:
         arg_parser.print_help()
-        raise Barf("unknown args: {0!r}".format(unknown))
+        raise UnknownArguments("unknown args: {0!r}".format(unknown))
     options.print_help = arg_parser.print_help
     return options
 
@@ -83,7 +127,7 @@ def get_vexrc(options, environ):
     # Complain if user specified nonexistent file with --config.
     # But we don't want to complain just because ~/.vexrc doesn't exist.
     if options.config and not os.path.exists(options.config):
-        raise Barf("nonexistent config: {0!r}".format(options.config))
+        raise InvalidVexrc("nonexistent config: {0!r}".format(options.config))
     filename = options.config or os.path.expanduser('~/.vexrc')
     vexrc = config.Vexrc.from_file(filename, environ)
     return vexrc
@@ -110,7 +154,8 @@ def get_cwd(options):
     if not options.cwd:
         return None
     if not os.path.exists(options.cwd):
-        raise Barf("can't --cwd to invalid path {0!r}".format(options.cwd))
+        raise InvalidCwd(
+            "can't --cwd to invalid path {0!r}".format(options.cwd))
     return options.cwd
 
 
@@ -124,13 +169,13 @@ def get_virtualenv_path(options, vexrc, environ):
     else:
         ve_base = vexrc.get_ve_base(environ)
         if not ve_base:
-            raise Barf(
+            raise NoVirtualenvsDirectory(
                 "could not figure out a virtualenvs directory. "
                 "make sure $HOME is set, or $WORKON_HOME,"
                 " or set virtualenvs=something in your .vexrc")
         if not os.path.exists(ve_base):
-            raise Barf("virtualenvs directory {0!r} not found."
-                        .format(ve_base))
+            raise NoVirtualenvsDirectory(
+                "virtualenvs directory {0!r} not found.".format(ve_base))
         ve_name = options.rest.pop(0) if options.rest else ''
         if not ve_name:
             return None
@@ -142,15 +187,15 @@ def get_virtualenv_path(options, vexrc, environ):
         # in which case 'foo' is a valid relative path to virtualenv foo.
         ve_path = os.path.join(ve_base, ve_name)
         if ve_path == ve_name and os.path.basename(ve_name) != ve_name:
-            raise Barf(
+            raise InvalidVirtualenv(
                 'To run in a virtualenv by its path, '
                 'use "vex --path {0}"'.format(ve_path))
 
     if not ve_path:
-        raise Barf("could not find a virtualenv name in the command line.")
+        raise InvalidVirtualenv("could not find a virtualenv name in the command line.")
     ve_path = os.path.abspath(ve_path)
     if not os.path.exists(ve_path):
-        raise Barf("no virtualenv found at {0!r}.".format(ve_path))
+        raise InvalidVirtualenv("no virtualenv found at {0!r}.".format(ve_path))
     return ve_path
 
 
@@ -164,10 +209,10 @@ def get_command(options, vexrc, environ):
     if not command:
         command = vexrc.get_shell(environ)
     if command and command[0].startswith('--'):
-        raise Barf("don't put flags like '%s' after the virtualenv name."
-                    % command[0])
+        raise InvalidCommand("don't put flags like '%s' after the virtualenv name."
+                             % command[0])
     if not command:
-        raise Barf("no command")
+        raise InvalidCommand("no command given")
     return command
 
 
@@ -184,7 +229,7 @@ def _main(environ, argv):
     env = get_environ(environ, vexrc['env'], ve_path)
     returncode = run(command, env=env, cwd=cwd)
     if returncode is None:
-        raise Barf("command not found: {0!r}".format(command[0]))
+        raise InvalidCommand("command not found: {0!r}".format(command[0]))
     return returncode
 
 
@@ -195,7 +240,7 @@ def main():
     returncode = 1
     try:
         returncode = _main(os.environ, argv)
-    except Barf as error:
+    except InvalidArgument as error:
         if error.message:
             sys.stderr.write("Error: " + error.message + '\n')
     sys.exit(returncode)
