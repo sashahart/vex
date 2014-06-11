@@ -83,7 +83,7 @@ def test_get_ve_base_not_in_vexrc_no_keys():
     assert 'virtualenvs' not in root
     with FakeEnviron(WORKON_HOME='tempting', HOME='nonsense'):
         environ = {}
-        assert vexrc.get_ve_base(environ) is None
+        assert vexrc.get_ve_base(environ) == ''
 
 
 def test_get_ve_base_not_in_vexrc_no_values():
@@ -92,4 +92,4 @@ def test_get_ve_base_not_in_vexrc_no_values():
     assert 'virtualenvs' not in root
     with FakeEnviron(WORKON_HOME='tempting', HOME='nonsense'):
         environ = {'WORKON_HOME': '', 'HOME': ''}
-        assert vexrc.get_ve_base(environ) is None
+        assert vexrc.get_ve_base(environ) == ''

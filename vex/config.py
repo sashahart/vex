@@ -86,9 +86,9 @@ class Vexrc(object):
         if not ve_base:
             home = environ.get('HOME', '')
             if not home:
-                return None
+                return ''
             ve_base = os.path.join(home, '.virtualenvs')
-        return ve_base or None
+        return ve_base or ''
 
     def get_shell(self, environ):
         """Find a command to run.
