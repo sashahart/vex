@@ -138,6 +138,7 @@ class TestWithVirtualenv(object):
     def test_inappropriate_abspath(self):
         assert self.venv.path != self.venv.name
         assert len(self.venv.path) > len(self.venv.name)
+        assert os.path.abspath(self.venv.path) == self.venv.path
         with Run([self.venv.path, 'echo', 'foo']) as run:
             run.finish()
             assert run.command_found
