@@ -17,6 +17,14 @@ logging.basicConfig(level=logging.DEBUG)
 
 
 class Run(object):
+    """Boilerplate for running a vex process with given parameters.
+
+    Context manager to ensure cleanup.
+    Timeout to try to prevent hung tests.
+    Can fake arguments and environment.
+    Normally expect tests to wait until process finishes,
+    but this is left to them for now.
+    """
     def __init__(self, args=None, env=None, timeout=None):
         self.args = args or []
         self.env = env.copy() if env else {}
@@ -80,9 +88,11 @@ class Run(object):
 
 
 def test_runs_without_args():
-    """
-    can be found on PATH, etc.
-    (assuming test is run in a virtualenv after pip install vex)
+    """vex
+
+    Runs, but emits an error, proving that the test environment actually does
+    have a vex executable on $PATH (as when run in a virtualenv after 'pip
+    install vex').
     """
     with Run([], timeout=0.5) as run:
         run.finish()
@@ -91,6 +101,10 @@ def test_runs_without_args():
 
 
 def test_help():
+    """vex --help
+
+    Emits stuff containing at least '--help', not an error.
+    """
     with Run(['--help'], timeout=0.5) as run:
         run.finish()
         assert run.out is not None
@@ -100,6 +114,10 @@ def test_help():
 
 
 def test_shell_config_no_arg():
+    """vex --shell-config
+
+    Non-traceback error.
+    """
     with Run(['--shell-config'], timeout=0.5) as run:
         run.finish()
         assert not run.out
@@ -107,6 +125,10 @@ def test_shell_config_no_arg():
 
 
 def test_shell_config():
+    """vex --shell-config bash
+
+    Emits something and doesn't crash
+    """
     with Run(['--shell-config', 'bash'], timeout=0.5) as run:
         run.finish()
         assert run.out
@@ -114,7 +136,11 @@ def test_shell_config():
 
 
 def test_find_with_HOME():
-    """Make sure we can find virtualenvs in $HOME/.virtualenvs/
+    """vex venvname echo foo
+
+    with HOME set to a path containing a .virtualenvs dir
+    containing a directory named venvname,
+    resolve venvname as that directory and run without error.
     """
     # 1. Make a temp directory
     # 2. Point the HOME variable at that
@@ -138,6 +164,9 @@ def test_find_with_HOME():
 # TODO: won't work on windows: no echo, pwd, etc. mark xfail or something
 class TestWithVirtualenv(object):
     def setup_class(self):
+        # It's not ideal that we make a virtualenv only once,
+        # but I'd rather do this than use a fake virtualenv
+        # or wait an hour for tests to finish most of the time
         self.parent = TempDir()
         self.venv = TempVenv(self.parent.path, 'vex_tests', [])
         self.venv.open()
@@ -149,11 +178,17 @@ class TestWithVirtualenv(object):
             self.parent.close()
 
     def test_virtualenv_created(self):
+        """Spurious test showing the 'test fixture' set up
+        """
         bin_path = os.path.join(self.venv.path, b'bin')
         assert isinstance(bin_path, path_type)
         assert os.path.exists(bin_path)
 
     def test_inappropriate_abspath(self):
+        """vex /stupid/absolute/path echo foo
+
+        This should be rejected with a non-traceback error
+        """
         assert self.venv.path != self.venv.name
         assert len(self.venv.path) > len(self.venv.name)
         assert os.path.abspath(self.venv.path) == self.venv.path
@@ -166,7 +201,12 @@ class TestWithVirtualenv(object):
             assert b'AssertionError' not in run.err
 
     def test_find_with_vexrc(self):
-        """Make sure we can find virtualenvs in the location given in .vexrc
+        """vex venvname echo foo
+
+        with $HOME pointing to a directory containing a .vexrc file
+        which contains a virtualenvs= line,
+        resolve first positional argument as virtualenv name under the path
+        given in the .vexrc.
         """
         # 1. Make a temp directory to play the role as HOME
         # 2. Point the HOME environment variable at that directory
@@ -190,7 +230,12 @@ class TestWithVirtualenv(object):
             assert run.out == b'foo\n'
 
     def test_find_with_config_option_vexrc(self):
-        """Make sure we can find virtualenvs in the location given in .vexrc
+        """vex --config somefile venvname echo foo
+
+        with arbitrary path passed as --config,
+        being the location of a .vexrc containing a virtualenvs= line,
+        resolve first positional argument as virtualenv name under the path
+        given in the .vexrc.
         """
         # 1. Make a temp directory to play the role as HOME
         # 2. Point the HOME environment variable at that directory
@@ -213,7 +258,11 @@ class TestWithVirtualenv(object):
             assert run.out == b'foo\n'
 
     def test_find_with_WORKON_HOME(self):
-        """Make sure we can find virtualenvs in $WORKON_HOME/
+        """vex venvname echo foo
+
+        with $WORKON_HOME set and nothing else,
+        resolve first positional argument as virtualenv name under
+        $WORKON_HOME/
         """
         # This one is easier, we just point WORKON_HOME
         # at the directory containing our venv
@@ -225,6 +274,10 @@ class TestWithVirtualenv(object):
             assert run.out == b'foo\n'
 
     def test_find_with_path_option(self):
+        """vex --path venvpath echo foo
+
+        no error, echoes foo
+        """
         with Run(["--path", self.venv.path, 'echo', 'foo']) as run:
             run.finish()
             assert not run.err, "unexpected stderr output: %r" % run.err
@@ -233,6 +286,10 @@ class TestWithVirtualenv(object):
             assert run.out == b'foo\n'
 
     def test_cwd_option(self):
+        """vex --cwd cwdpath venvname pwd
+
+        prints out the value of cwdpath, no errors
+        """
         env = {'WORKON_HOME': self.parent.path.decode('utf-8')}
         with EmptyTempDir() as cwd, \
              Run(['--cwd', cwd.path, self.venv.name, 'pwd'], env=env) as run:
@@ -247,6 +304,10 @@ class TestWithVirtualenv(object):
             assert run.out == cwd.path + b'\n'
 
     def test_invalid_cwd(self):
+        """vex --cwd nonexistentpath venvname pwd
+
+        error but no traceback
+        """
         env = {'WORKON_HOME': self.parent.path.decode('utf-8')}
         cwd = os.path.join('tmp', 'reallydoesnotexist')
         assert not os.path.exists(cwd)
