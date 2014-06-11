@@ -17,6 +17,9 @@ setup(
     packages=['vex'],
     package_data={'vex': ['shell_configs/*']},
     scripts=['scripts/vex'],
+    entry_points = {
+        'console_scripts': ['vex = vex.main:main'],
+    },
     classifiers=[
         "Intended Audience :: Developers",
         "Programming Language :: Python :: 3.4",
