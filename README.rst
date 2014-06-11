@@ -12,7 +12,6 @@ And it works with non-bash shells.
 
 (It doesn't make or remove virtualenvs, though. Should it?)
 
-
 How it works
 ============
 
@@ -81,6 +80,12 @@ Try it out.
     Launch your shell (as specified in SHELL or ~/.vexrc) in virtualenv foo
     (this is like a direct replacement for 'workon').
 
+``vex foo cmd``
+    On Windows, this launches a "DOS" shell using virtualenv foo.
+    (Try that with virtualenvwrapper!)
+
+``vex foo powershell``
+    On Windows, this launches a PowerShell instance using virtualenv foo.
 
 If you break things by doing weird fun things with vex, you get to keep all the
 pieces left over.
@@ -94,16 +99,24 @@ vex with the user scheme as follows::
 
     pip install --user vex
 
-There are two reasons for this.
+Though --user requires a little initial setup, this setup occurs once for all
+tools (see the next section), experienced Python developers have already done
+it, and there are two reasons for using it despite the small extra trouble.
 
 First, it is not that convenient to use vex only from a virtualenv (though you
 can) because then you need to use some other technique to activate the
 virtualenv in which you have vex installed, in order to get access to it.
+That would usually be an unnecessary waste of time.
 
 Second, it does not require root privileges and does not make any system-wide
 messes. Installing Python libraries system-wide is something you should
 normally leave to your OS package manager; you are probably doing yourself
-a favor if you learn never to use 'sudo pip' or 'sudo easy_install'.
+a favor if you learn never to use ``sudo pip`` or ``sudo easy_install``.
+``pip install --user`` mostly substitutes for the purposes which would
+otherwise use ``sudo``.
+As an added benefit, you can use ``pip install --user`` on systems where you
+are not allowed to make global modifications, or voluntarily refrain in order
+to protect the global configuration.
 
 You shouldn't normally have to separately install virtualenv; pip should drag
 that in if you don't already have it.
@@ -111,6 +124,96 @@ that in if you don't already have it.
 If you don't have pip, `learn to install pip <http://pip.readthedocs.org/en/latest/installing.html>`_.
 
 To uninstall, just use ``pip uninstall vex -y``.
+
+
+First-time setup for Python beginners
+=====================================
+
+The PATH problem
+----------------
+
+Though ``pip install --user`` is the way I recommend to install command-line
+Python tools like vex, it won't necessarily give you immediate results if your
+machine is not fully set up for Python development. The reason is that
+``pip install --user`` puts the script in a directory which isn't on the
+default ``$PATH`` (Windows: ``%PATH%``; PowerShell: ``$env:path``).
+
+For example, a Linux user named sam might see the script installed at::
+
+    /home/sam/.local/bin/vex
+
+(the exact path may vary); typing 'vex' will result in a 'command not
+found', though inconveniently typing the absolute path will work.
+Similarly, a Windows user named sam might see the script installed at::
+
+    c:\users\sam\appdata\roaming\python\scripts\vex
+
+and typing 'vex' will result in 'is not recognized' ... but again, giving
+an absolute path will work, it's just inconvenient.
+This is not that hard to solve, if you have it then PLEASE take a few minutes
+to walk through the next section.
+
+The PATH solution
+-----------------
+
+**The solution is to adjust your PATH to include the appropriate directory.**
+
+For example, on Linux, sam might edit his shell config (e.g., ~/.profile) at
+the end, to read::
+
+    PATH=$PATH:/home/sam/.local/bin
+
+while on Windows, sam might go into the 'Environment Variables' control panel
+(Control Panel > System > Advanced System Settings > Environment Variables)
+and in the upper box under 'User variables for sam', double-click 'PATH',
+and append the following to its current value (semicolon and all)::
+
+    ;c:\users\sam\appdata\roaming\python\scripts
+
+This will allow Windows to know what you mean when you type 'vex' (or the name
+of any Python command-line tool which supports Windows and which you have
+wisely installed with ``pip install --user``).
+
+The .virtualenvs directory
+--------------------------
+
+vex users who used virtualenvwrapper should find that vex works well with
+their current setup, usually with no changes.
+
+The first argument to 'vex' (i.e., the 'foo' in 'vex foo') is not the path to
+a virtualenv. It's the name of a virtualenv, which is to be found in
+a directory you keep virtualenvs (the location is configurable).
+
+If you never used virtualenv or virtualenvwrapper before, you might want to
+create a directory called .virtualenvs (that starts with a dot) in your home
+directory, e.g.::
+
+    mkdir /home/sam/.virtualenvs
+
+or on Windows::
+
+    mkdir c:\users\sam\.virtualenvs
+
+These are just examples! Your paths might be different. As a developer you
+should learn about how to find your home directory.
+
+Once this is done, you can use the original virtualenv tool to make new
+virtualenvs there, e.g. to make a virtualenv named 'foo'::
+
+    virtualenv /home/sam/.virtualenvs/foo
+
+or on Windows::
+
+    mkdir c:\users\sam\.virtualenvs\foo
+
+(if there is demand I'll implement a switch in vex to automate this slightly
+more.)
+
+Once you have a virtualenv made under .virtualenvs,
+you can use vex to run whatever inside that virtualenv - for example,
+start a python shell using::
+
+    vex foo python
 
 
 
@@ -134,7 +237,6 @@ like this shell which starts in ``/tmp``::
     vex --cwd /tmp foo bash
 
 
-
 Config
 ======
 
@@ -149,7 +251,7 @@ file to specify defaults. Its default location ``~/.vexrc``. Example::
 This specifies that the result of running ``vex foo`` (no command)
 is to run bash, as in ``vex foo bash``;
 that the place to look for named virtualenvs
-is ``~/.my_virtualenvs``; and that processes launched by vex should all
+is ``~/.my_virtualenvs``; and that processes you launched with vex should all
 get certain environment variables (in this case, ``ANSWER`` set to ``42``).
 
 If you want to use a config someplace other than ``~/.vexrc``::
@@ -164,7 +266,7 @@ This section gives some simple examples of how you could customize your shell
 to reflect the current virtualenv, since vex intentionally does not mess with
 your shell's prompt (in order to stay shell-agnostic).
 
-Don't put these in ``~/.vexrc``, that won't do anything!
+Beginner's note: don't put these in ``~/.vexrc``, that won't do anything!
 If you don't know what you're doing, use the suggested filenames.
 
 
@@ -205,13 +307,13 @@ Here is an example of what you could put in ``~/.zshrc``:
 ksh
 ---
 
-Here is something you can start from in ~/.kshrc:
+Here is something you can start from in ``~/.kshrc``:
 
 .. code-block:: ksh
 
     PS1='${VIRTUAL_ENV:+($( basename $VIRTUAL_ENV )) }${USER}@${HOSTNAME:=$(hostname)}:$PWD> '
 
-This should also work for mksh in ~/.mkshrc.
+This should also work for mksh in ``~/.mkshrc``.
 
 
 fish
@@ -235,9 +337,9 @@ tcsh
 
 If you're among the proud few who use tcsh, this kind of works
 (and you may ridicule my terrible csh skills and propose a better solution!)
-However, it relies on $VIRTUAL_ENV never changing, so in other words it's
+However, it relies on ``$VIRTUAL_ENV`` never changing, so in other words it's
 really only usable if you stick to vex when using tcsh, and don't mess with
-$VIRTUAL_ENV yourself.
+``$VIRTUAL_ENV`` yourself. There has to be a better solution...
 
 .. code-block:: tcsh
 
@@ -255,6 +357,11 @@ completion of the 'vex' command for several popular shells.
 This allows you to do things like hitting the 'TAB' key
 after 'vex mye' and getting it expanded to 'vex myenv'.
 (Specific features depend on the shell.)
+It's completely optional. vex will work without it. So if vex doesn't have
+a completion configuration for your shell, don't worry, you can still use vex.
+And if you want a completion config, please suggest or contribute one
+on `Github <https://github.com/sashahart/vex>`_.
+
 
 Since completion requires a modification of the current shell
 state, and vex refuses to do this, it can be done by having the shell
@@ -293,7 +400,6 @@ This could be put in, e.g., ``~/.config/fish/config.fish``.
     . (vex --shell-config fish|psub)
 
 
-
 Caveats
 =======
 
@@ -302,23 +408,25 @@ command, vex will naturally think they are meant for the command.
 For example, ``vex foo mope -h`` cannot be understood as providing
 an -h flag to vex; vex has to interpret it as part of the command.
 Even ``vex foo -h mope`` must interpret '-h mope' as a command, because it is
-possible that an executable name on $PATH begins with a dash.
+possible that an executable name on ``$PATH`` begins with a dash.
 
 vex won't use virtualenvs with names that start with a dash, because this is
-the character which prefixes a command-line flag (option). Tough break.
+the character which prefixes a command-line flag (option).
 
 Don't be surprised if 'vex foo sudo bash' results in a shell that doesn't use
 your virtualenv. Safe sudo policy often controls the environment, notably as
 a default on Debian and Ubuntu. It's better not to mess with this policy,
 especially if you knew little enough that you wondered why it didn't work.
-As a workaround, you can use this::
+As a workaround, you can use this:
+
+.. code-block:: bash
 
     sudo env PATH="$PATH" vex foo bash
 
-vex should not be noticeably slow to mere mortals, but if you run it a million
-times in a script then the effects of python startup might become noticeable.
-If you have this problem, consider running your virtualenv's python directly.
-(It works at least as well, it's just usually less convenient.)
+vex should not be particularly slow to mere mortals, but if you run it
+a million times in a script then the effects of python startup might become
+noticeable. If you have this problem, consider running your virtualenv's python
+directly. (It works at least as well, it's just usually less convenient.)
 
 If you run e.g. ``bash -c ls`` you may see that ls does not generate color,
 because it decides whether to do that after detecting whether it is talking to
@@ -336,12 +444,16 @@ For example, ``vex foo bar baz`` will be interpreted by bash/zsh as running
 Again, this isn't down to vex, it is just how these shells work.
 
 Mind the results of asking to run commands with shell variables in them.
-For example, you might expect this to print 'foo'::
+For example, you might expect this to print 'foo':
+
+.. code-block:: bash
 
     vex foo echo $VIRTUAL_ENV
 
 The reason it doesn't is that your current shell is interpreting $VIRTUAL_ENV
-even before vex gets it or can pass it to the subprocess. You could quote it::
+even before vex gets it or can pass it to the subprocess. You could quote it:
+
+.. code-block:: bash
 
     vex foo echo '$VIRTUAL_ENV'
 
