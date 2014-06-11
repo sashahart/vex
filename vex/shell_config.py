@@ -3,7 +3,6 @@ This is not needed to use vex.
 It just lets us provide a convenient mechanism for people
 with popular shells to set up autocompletion.
 """
-import sys
 import os
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
@@ -22,31 +21,32 @@ with open(os.path.join(_HERE, 'shell_configs', 'fish'), 'rb') as inp:
     _FISH_CONFIG = inp.read()
 
 
-def zsh_config(out, vexrc, environ):
+
+def zsh_config(vexrc, environ):
     ve_base = vexrc.get_ve_base(environ).encode('ascii')
     if ve_base:
         data = _ZSH_CONFIG.replace(b'$WORKON_HOME', ve_base)
     else:
         data = _ZSH_CONFIG
-    out.write(data)
+    return data
 
 
-def bash_config(out, vexrc, environ):
+def bash_config(vexrc, environ):
     ve_base = vexrc.get_ve_base(environ).encode('ascii')
     if ve_base:
         data = _BASH_CONFIG.replace(b'$WORKON_HOME', ve_base)
     else:
         data = _BASH_CONFIG
-    out.write(data)
+    return data
 
 
-def fish_config(out, vexrc, environ):
+def fish_config(vexrc, environ):
     ve_base = vexrc.get_ve_base(environ).encode('ascii')
     if ve_base:
         data = _FISH_CONFIG.replace(b'$WORKON_HOME', ve_base)
     else:
         data = _FISH_CONFIG
-    out.write(data)
+    return data
 
 
 _SHELLS = {
@@ -56,11 +56,8 @@ _SHELLS = {
 }
 
 
-def emit_shell_config_for(shell, vexrc, environ):
+def shell_config_for(shell, vexrc, environ):
     function = _SHELLS.get(shell)
     if function:
-        if hasattr(sys.stdout, 'buffer'):
-            out = sys.stdout.buffer
-        else:
-            out = sys.stdout
-        function(out, vexrc, environ)
+        return function(vexrc, environ)
+    return ""

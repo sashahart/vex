@@ -18,7 +18,7 @@ def error(message):
     raise BadConfigError(message)
 
 
-def make_env(environ, defaults, options):
+def get_environ(environ, defaults, ve_path):
     """Make an environment to run with.
     """
     # Copy the parent environment, add in defaults from .vexrc.
@@ -30,12 +30,10 @@ def make_env(environ, defaults, options):
         del env['PYTHONHOME']
 
     # Now we have to adjust PATH to find scripts for the virtualenv...
-    # PATH being unset/empty is OK, but options.path must be set
+    # PATH being unset/empty is OK, but ve_path must be set
     # or there is nothing for us to do here and it's bad.
-    if not options.path:
-        error('options.path must be set')
-        return None
-    ve_bin = os.path.join(options.path, 'bin')
+    assert ve_path
+    ve_bin = os.path.join(ve_path, 'bin')
     if not ve_bin:
         error('ve_bin must be set')
         return None
@@ -66,7 +64,7 @@ def make_env(environ, defaults, options):
         segments.remove(current_ve_bin)
     segments.insert(0, ve_bin)
     env['PATH'] = os.pathsep.join(segments)
-    env['VIRTUAL_ENV'] = options.path
+    env['VIRTUAL_ENV'] = ve_path
     return env
 
 
