@@ -241,3 +241,14 @@ class TestWithVirtualenv(object):
             assert cwd.path != self.venv.path
             assert cwd.path != self.parent.path
             assert run.out == cwd.path + b'\n'
+
+    def test_invalid_cwd(self):
+        env = {'WORKON_HOME': self.parent.path.decode('utf-8')}
+        cwd = os.path.join('tmp', 'reallydoesnotexist')
+        assert not os.path.exists(cwd)
+        with Run(['--cwd', cwd, self.venv.name, 'pwd'], env=env) as run:
+            run.finish()
+            assert run.command_found
+            assert run.err
+            assert not run.err.startswith(b'Traceback')
+            assert run.returned != 0
