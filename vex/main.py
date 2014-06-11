@@ -15,6 +15,12 @@ class InvalidArgument(Exception):
         Exception.__init__(self, message)
 
 
+class NoVirtualenvName(InvalidArgument):
+    """No virtualenv name was given (insufficient arguments).
+    """
+    pass
+
+
 class NoVirtualenvsDirectory(InvalidArgument):
     """There is no directory to find named virtualenvs in.
     """
@@ -178,7 +184,9 @@ def get_virtualenv_path(options, vexrc, environ):
                 "virtualenvs directory {0!r} not found.".format(ve_base))
         ve_name = options.rest.pop(0) if options.rest else ''
         if not ve_name:
-            return None
+            raise NoVirtualenvName(
+                "could not find a virtualenv name in the command line."
+            )
 
         # n.b.: if ve_name is absolute, ve_base is discarded by os.path.join,
         # and an absolute path will be accepted as first arg.
@@ -224,7 +232,12 @@ def _main(environ, argv):
     if options.shell_to_configure:
         return handle_shell_config(options, vexrc, environ)
     cwd = get_cwd(options)
-    ve_path = get_virtualenv_path(options, vexrc, environ)
+    try:
+        ve_path = get_virtualenv_path(options, vexrc, environ)
+    except NoVirtualenvName:
+        options.print_help()
+        raise
+        return 1
     command = get_command(options, vexrc, environ)
     env = get_environ(environ, vexrc['env'], ve_path)
     returncode = run(command, env=env, cwd=cwd)
@@ -240,6 +253,9 @@ def main():
     returncode = 1
     try:
         returncode = _main(os.environ, argv)
+    except NoVirtualenvName:
+        sys.stderr.write("\n")
+        sys.stderr.write("Error: no virtualenv name found in command line.\n")
     except InvalidArgument as error:
         if error.message:
             sys.stderr.write("Error: " + error.message + '\n')

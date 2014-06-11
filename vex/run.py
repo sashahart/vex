@@ -32,7 +32,9 @@ def get_environ(environ, defaults, ve_path):
     # Now we have to adjust PATH to find scripts for the virtualenv...
     # PATH being unset/empty is OK, but ve_path must be set
     # or there is nothing for us to do here and it's bad.
-    assert ve_path
+    if not ve_path:
+        error('ve_path must be set')
+        return None
     ve_bin = os.path.join(ve_path, 'bin')
     if not ve_bin:
         error('ve_bin must be set')
