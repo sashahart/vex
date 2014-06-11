@@ -146,7 +146,7 @@ def handle_shell_config(options, vexrc, environ):
     data = shell_config.shell_config_for(
         options.shell_to_configure, vexrc, environ)
     if not data:
-        raise OtherShell(options.shell_to_configure)
+        raise OtherShell("unknown shell: " + options.shell_to_configure)
     if hasattr(sys.stdout, 'buffer'):
         sys.stdout.buffer.write(data)
     else:
