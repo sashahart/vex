@@ -6,8 +6,8 @@ from vex import run
 from . fakes import FakeEnviron, PatchedModule, FakePopen, Object
 
 
-def test_make_env():
-    options = Object(path='thing')
+def test_get_environ():
+    path = 'thing'
     defaults = {'from_defaults': 'b'}
     original = {
         'PATH': os.path.pathsep.join(['crap', 'bad_old_ve/bin', 'junk']),
@@ -18,7 +18,7 @@ def test_make_env():
     passed_environ = original.copy()
     with FakeEnviron() as os_environ, \
          PatchedModule(os.path, exists=lambda path: True):
-        result = run.make_env(passed_environ, defaults, options)
+        result = run.get_environ(passed_environ, defaults, path)
         # os.environ should not be changed in any way.
         assert len(os_environ) == 0
     # nor should the passed environ be changed in any way.
@@ -33,8 +33,7 @@ def test_make_env():
     assert result['PATH'] == os.path.pathsep.join(
         ['thing/bin', 'crap', 'junk']
     )
-    # and VIRTUAL_ENV is options.path
-    assert result['VIRTUAL_ENV'] == options.path
+    assert result['VIRTUAL_ENV'] == path
 
 
 def test_run():

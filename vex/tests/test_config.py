@@ -1,7 +1,8 @@
+import os
 from io import BytesIO
 from mock import patch
 from vex import config
-from . fakes import FakeEnviron
+from . fakes import FakeEnviron, PatchedModule
 
 
 TYPICAL_VEXRC = """
@@ -81,7 +82,8 @@ def test_get_ve_base_not_in_vexrc_no_keys():
     vexrc = config.Vexrc()
     root = vexrc.headings[vexrc.default_heading]
     assert 'virtualenvs' not in root
-    with FakeEnviron(WORKON_HOME='tempting', HOME='nonsense'):
+    with FakeEnviron(WORKON_HOME='tempting', HOME='nonsense'), \
+            PatchedModule(os.path, expanduser=lambda p: ''):
         environ = {}
         assert vexrc.get_ve_base(environ) == ''
 
@@ -90,6 +92,7 @@ def test_get_ve_base_not_in_vexrc_no_values():
     vexrc = config.Vexrc()
     root = vexrc.headings[vexrc.default_heading]
     assert 'virtualenvs' not in root
-    with FakeEnviron(WORKON_HOME='tempting', HOME='nonsense'):
+    with FakeEnviron(WORKON_HOME='tempting', HOME='nonsense'), \
+    PatchedModule(os.path, expanduser=lambda p: ''):
         environ = {'WORKON_HOME': '', 'HOME': ''}
         assert vexrc.get_ve_base(environ) == ''
