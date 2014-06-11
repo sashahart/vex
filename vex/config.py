@@ -4,6 +4,7 @@ import os
 import sys
 import re
 import shlex
+import platform
 from collections import OrderedDict
 
 _IDENTIFIER_PATTERN = '[a-zA-Z][_a-zA-Z0-9]*'
@@ -84,7 +85,16 @@ class Vexrc(object):
         else:
             ve_base = environ.get('WORKON_HOME', '')
         if not ve_base:
-            home = os.path.expanduser('~')
+            # On Cygwin os.name == 'posix' and we want $HOME.
+            if platform.system == 'Windows' and os.name == 'nt':
+                _win_drive = environ.get('HOMEDRIVE')
+                home = environ.get('HOMEPATH', '')
+                if home:
+                    home = os.path.join(_win_drive, home)
+            else:
+                home = environ.get('HOME', '')
+            if not home:
+                home = os.path.expanduser('~')
             if not home:
                 return ''
             ve_base = os.path.join(home, '.virtualenvs')
