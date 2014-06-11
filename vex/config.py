@@ -84,7 +84,7 @@ class Vexrc(object):
         else:
             ve_base = environ.get('WORKON_HOME', '')
         if not ve_base:
-            home = environ.get('HOME', '')
+            home = os.path.expanduser('~')
             if not home:
                 return ''
             ve_base = os.path.join(home, '.virtualenvs')
