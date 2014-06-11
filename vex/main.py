@@ -99,7 +99,7 @@ def make_arg_parser():
         dest="shell_to_configure",
         action="store",
         default=None,
-        help="print optional config for evaluation by the specified shell"
+        help="print optional config for the specified shell"
     )
     parser.add_argument(
         "rest",
