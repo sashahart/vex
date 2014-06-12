@@ -17,10 +17,6 @@ class BadConfigError(Exception):
     pass
 
 
-def error(message):
-    raise BadConfigError(message)
-
-
 def get_environ(environ, defaults, ve_path):
     """Make an environment to run with.
     """
@@ -36,21 +32,18 @@ def get_environ(environ, defaults, ve_path):
     # PATH being unset/empty is OK, but ve_path must be set
     # or there is nothing for us to do here and it's bad.
     if not ve_path:
-        error('ve_path must be set')
-        return None
+        raise BadConfigError('ve_path must be set')
     if platform.system() == 'Windows':
         ve_bin = os.path.join(ve_path, 'Scripts')
     else:
         ve_bin = os.path.join(ve_path, 'bin')
     if not ve_bin:
-        error('ve_bin must be set')
-        return None
+        raise BadConfigError('ve_bin must be set')
 
     # I don't expect this to fail, but I'd rather be slightly paranoid and fail
     # early before putting a nonexistent path on PATH.
     if not os.path.exists(ve_bin):
-        error('ve_bin %r does not exist' % ve_bin)
-        return None
+        raise BadConfigError('ve_bin %r does not exist' % ve_bin)
 
     # If user is currently in a virtualenv, DON'T just prepend
     # to its path (vex foo; echo $PATH -> " /foo/bin:/bar/bin")
