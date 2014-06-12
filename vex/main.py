@@ -200,7 +200,8 @@ def get_virtualenv_path(options, vexrc, environ):
                 'use "vex --path {0}"'.format(ve_path))
 
     if not ve_path:
-        raise InvalidVirtualenv("could not find a virtualenv name in the command line.")
+        raise InvalidVirtualenv(
+            "could not find a virtualenv name in the command line.")
     ve_path = os.path.abspath(ve_path)
     if not os.path.exists(ve_path):
         raise InvalidVirtualenv("no virtualenv found at {0!r}.".format(ve_path))
@@ -217,8 +218,9 @@ def get_command(options, vexrc, environ):
     if not command:
         command = vexrc.get_shell(environ)
     if command and command[0].startswith('--'):
-        raise InvalidCommand("don't put flags like '%s' after the virtualenv name."
-                             % command[0])
+        raise InvalidCommand(
+            "don't put flags like '%s' after the virtualenv name."
+            % command[0])
     if not command:
         raise InvalidCommand("no command given")
     return command
@@ -237,7 +239,6 @@ def _main(environ, argv):
     except NoVirtualenvName:
         options.print_help()
         raise
-        return 1
     command = get_command(options, vexrc, environ)
     env = get_environ(environ, vexrc['env'], ve_path)
     returncode = run(command, env=env, cwd=cwd)

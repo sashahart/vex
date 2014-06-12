@@ -8,8 +8,8 @@ import platform
 from collections import OrderedDict
 
 _IDENTIFIER_PATTERN = '[a-zA-Z][_a-zA-Z0-9]*'
-_SQUOTE_RE = re.compile("'([^']*)'\Z")  # NO squotes inside
-_DQUOTE_RE = re.compile('"([^"]*)"\Z')  # NO dquotes inside
+_SQUOTE_RE = re.compile(r"'([^']*)'\Z")  # NO squotes inside
+_DQUOTE_RE = re.compile(r'"([^"]*)"\Z')  # NO dquotes inside
 _HEADING_RE = re.compile(
     r'^(' + _IDENTIFIER_PATTERN + r'):[ \t\n\r]*\Z')
 _VAR_RE = re.compile(
@@ -158,13 +158,12 @@ def parse_vexrc(inp, environ):
             if extracted_heading is not None:
                 heading = extracted_heading
                 continue
-            kv = extract_key_value(line, environ)
-            if kv is None:
+            kv_tuple = extract_key_value(line, environ)
+            if kv_tuple is None:
                 errors.append((line_number, line))
                 continue
-            key, value = kv
             try:
-                yield heading, key, value
+                yield heading, kv_tuple[0], kv_tuple[1]
             except GeneratorExit:
                 break
     if errors:
