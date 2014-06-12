@@ -102,6 +102,8 @@ class Vexrc(object):
             if not home:
                 return ''
             ve_base = os.path.join(home, '.virtualenvs')
+        if not os.path.exists(ve_base) or os.path.isfile(ve_base):
+            return ''
         return ve_base or ''
 
     def get_shell(self, environ):

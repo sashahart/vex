@@ -27,6 +27,7 @@ def zsh_config(vexrc, environ):
     """
     ve_base = vexrc.get_ve_base(environ).encode('ascii')
     if ve_base:
+        assert os.path.exists(ve_base)
         data = _ZSH_CONFIG.replace(b'$WORKON_HOME', ve_base)
     else:
         data = _ZSH_CONFIG
@@ -38,6 +39,7 @@ def bash_config(vexrc, environ):
     """
     ve_base = vexrc.get_ve_base(environ).encode('ascii')
     if ve_base:
+        assert os.path.exists(ve_base)
         data = _BASH_CONFIG.replace(b'$WORKON_HOME', ve_base)
     else:
         data = _BASH_CONFIG
@@ -49,6 +51,7 @@ def fish_config(vexrc, environ):
     """
     ve_base = vexrc.get_ve_base(environ).encode('ascii')
     if ve_base:
+        assert os.path.exists(ve_base)
         data = _FISH_CONFIG.replace(b'$WORKON_HOME', ve_base)
     else:
         data = _FISH_CONFIG

@@ -54,8 +54,15 @@ def test_read_vexrc_expand():
 def test_get_ve_base_in_vexrc():
     vexrc = config.Vexrc()
     root = vexrc.headings[vexrc.default_heading]
+
+    def fake_exists(path):
+        if path == '/specific/override':
+            return True
+        return False
+
     root['virtualenvs'] = '/specific/override'
-    with FakeEnviron(WORKON_HOME='tempting', HOME='nonsense'):
+    with FakeEnviron(WORKON_HOME='tempting', HOME='nonsense'), \
+            PatchedModule(os.path, exists=fake_exists):
         environ = {'WORKON_HOME': '/bad1', 'HOME': '/bad2'}
         assert vexrc.get_ve_base(environ) == '/specific/override'
 
@@ -64,7 +71,14 @@ def test_get_ve_base_not_in_vexrc_workon_home():
     vexrc = config.Vexrc()
     root = vexrc.headings[vexrc.default_heading]
     assert 'virtualenvs' not in root
-    with FakeEnviron(WORKON_HOME='tempting', HOME='nonsense'):
+
+    def fake_exists(path):
+        if path == '/workon/home':
+            return True
+        return False
+
+    with FakeEnviron(WORKON_HOME='tempting', HOME='nonsense'), \
+            PatchedModule(os.path, exists=fake_exists):
         environ = {'WORKON_HOME': '/workon/home', 'HOME': '/bad'}
         assert vexrc.get_ve_base(environ) == '/workon/home'
 
@@ -73,7 +87,14 @@ def test_get_ve_base_not_in_vexrc_home():
     vexrc = config.Vexrc()
     root = vexrc.headings[vexrc.default_heading]
     assert 'virtualenvs' not in root
-    with FakeEnviron(WORKON_HOME='tempting', HOME='nonsense'):
+
+    def fake_exists(path):
+        if path in ('/home/user', '/home/user/.virtualenvs'):
+            return True
+        return False
+
+    with FakeEnviron(WORKON_HOME='tempting', HOME='nonsense'), \
+            PatchedModule(os.path, exists=fake_exists):
         environ = {'HOME': '/home/user'}
         assert vexrc.get_ve_base(environ) == '/home/user/.virtualenvs'
 
