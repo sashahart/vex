@@ -23,6 +23,8 @@ with open(os.path.join(_HERE, 'shell_configs', 'fish'), 'rb') as inp:
 
 
 def zsh_config(vexrc, environ):
+    """return completion config for zsh.
+    """
     ve_base = vexrc.get_ve_base(environ).encode('ascii')
     if ve_base:
         data = _ZSH_CONFIG.replace(b'$WORKON_HOME', ve_base)
@@ -32,6 +34,8 @@ def zsh_config(vexrc, environ):
 
 
 def bash_config(vexrc, environ):
+    """return completion config for bash.
+    """
     ve_base = vexrc.get_ve_base(environ).encode('ascii')
     if ve_base:
         data = _BASH_CONFIG.replace(b'$WORKON_HOME', ve_base)
@@ -41,6 +45,8 @@ def bash_config(vexrc, environ):
 
 
 def fish_config(vexrc, environ):
+    """return completion config for fish.
+    """
     ve_base = vexrc.get_ve_base(environ).encode('ascii')
     if ve_base:
         data = _FISH_CONFIG.replace(b'$WORKON_HOME', ve_base)
@@ -57,6 +63,8 @@ _SHELLS = {
 
 
 def shell_config_for(shell, vexrc, environ):
+    """return completion config for the named shell.
+    """
     function = _SHELLS.get(shell)
     if function:
         return function(vexrc, environ)

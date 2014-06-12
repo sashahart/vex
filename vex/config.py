@@ -52,11 +52,15 @@ class Vexrc(object):
 
     @classmethod
     def from_file(cls, path, environ):
+        """Make a Vexrc instance from given file in given environ.
+        """
         instance = cls()
         instance.read(path, environ)
         return instance
 
     def read(self, path, environ):
+        """Read data from file into this vexrc instance.
+        """
         try:
             inp = open(path, 'rb')
         except FileNotFoundError as error:
@@ -111,6 +115,8 @@ class Vexrc(object):
 
 
 def extract_heading(line):
+    """Return heading in given line or None if it's not a heading.
+    """
     match = _HEADING_RE.match(line)
     if match:
         return match.group(1)
@@ -118,6 +124,8 @@ def extract_heading(line):
 
 
 def extract_key_value(line, environ):
+    """Return key, value from given line if present, else return None.
+    """
     segments = line.split("=", 1)
     if len(segments) < 2:
         return None
@@ -137,6 +145,10 @@ def extract_key_value(line, environ):
 
 
 def parse_vexrc(inp, environ):
+    """Iterator yielding key/value pairs from given stream.
+
+    yields tuples of heading, key, value.
+    """
     heading = None
     errors = []
     with inp:

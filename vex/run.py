@@ -12,6 +12,8 @@ else:
 
 
 class BadConfigError(Exception):
+    """raised to halt on fatal conditions on the way to run.
+    """
     pass
 
 
