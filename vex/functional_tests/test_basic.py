@@ -267,7 +267,7 @@ class TestWithVirtualenv(object):
         """
         # This one is easier, we just point WORKON_HOME
         # at the directory containing our venv
-        env = {'WORKON_HOME': self.parent.path.decode('utf-8')}
+        env = {'HOME': 'ignore', 'WORKON_HOME': self.parent.path.decode('utf-8')}
         with Run([self.venv.name, 'echo', 'foo'], env=env) as run:
             run.finish()
             assert run.command_found
@@ -292,7 +292,7 @@ class TestWithVirtualenv(object):
 
         prints out the value of cwdpath, no errors
         """
-        env = {'WORKON_HOME': self.parent.path.decode('utf-8')}
+        env = {'HOME': 'ignore', 'WORKON_HOME': self.parent.path.decode('utf-8')}
         with EmptyTempDir() as cwd, \
              Run(['--cwd', cwd.path, self.venv.name, 'pwd'], env=env) as run:
             run.finish()
