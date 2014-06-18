@@ -4,6 +4,10 @@ It just lets us provide a convenient mechanism for people
 with popular shells to set up autocompletion.
 """
 import os
+import re
+
+NOT_SCARY = re.compile(br'[~]?(?:[/]+[\w _,.][\w _\-,.]+)*\Z')
+
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
 
@@ -21,12 +25,23 @@ with open(os.path.join(_HERE, 'shell_configs', 'fish'), 'rb') as inp:
     _FISH_CONFIG = inp.read()
 
 
+def scary_path(path):
+    """Whitelist the WORKON_HOME strings we're willing to substitute in
+    to strings that we provide for user's shell to evaluate.
+
+    If it smells at all bad, return True.
+    """
+    if not path:
+        return True
+    assert isinstance(path, bytes)
+    return not NOT_SCARY.match(path)
+
 
 def zsh_config(vexrc, environ):
     """return completion config for zsh.
     """
     ve_base = vexrc.get_ve_base(environ).encode('ascii')
-    if ve_base:
+    if ve_base and not scary_path(ve_base):
         assert os.path.exists(ve_base)
         data = _ZSH_CONFIG.replace(b'$WORKON_HOME', ve_base)
     else:
@@ -38,7 +53,7 @@ def bash_config(vexrc, environ):
     """return completion config for bash.
     """
     ve_base = vexrc.get_ve_base(environ).encode('ascii')
-    if ve_base:
+    if ve_base and not scary_path(ve_base):
         assert os.path.exists(ve_base)
         data = _BASH_CONFIG.replace(b'$WORKON_HOME', ve_base)
     else:
@@ -50,7 +65,7 @@ def fish_config(vexrc, environ):
     """return completion config for fish.
     """
     ve_base = vexrc.get_ve_base(environ).encode('ascii')
-    if ve_base:
+    if ve_base and not scary_path(ve_base):
         assert os.path.exists(ve_base)
         data = _FISH_CONFIG.replace(b'$WORKON_HOME', ve_base)
     else:
