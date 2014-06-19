@@ -5,7 +5,7 @@ with open('README.rst', 'r') as inp:
 
 setup(
     name="vex",
-    version="0.0.2",
+    version="0.0.3",
     author="Sasha Hart",
     author_email="s@sashahart.net",
     url="http://github.com/sashahart/vex",
