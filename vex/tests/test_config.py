@@ -17,6 +17,24 @@ b='{SHELL}'
 """.lstrip().encode('utf-8')
 
 
+def make_fake_exists(accepted_paths):
+
+    assert not isinstance(accepted_paths, str)
+
+    def fake_exists(path):
+        if path in accepted_paths:
+            return True
+        return False
+
+    return fake_exists
+
+
+def test_fake_exists():
+    fake_exists = make_fake_exists(['/special'])
+    assert fake_exists('/special')
+    assert not fake_exists('/dev')
+
+
 def test_extract_heading():
     fn = config.extract_heading
     assert fn("foo:") == "foo"
@@ -55,11 +73,7 @@ def test_get_ve_base_in_vexrc():
     vexrc = config.Vexrc()
     root = vexrc.headings[vexrc.default_heading]
 
-    def fake_exists(path):
-        if path == '/specific/override':
-            return True
-        return False
-
+    fake_exists = make_fake_exists(['/specific/override'])
     root['virtualenvs'] = '/specific/override'
     with FakeEnviron(WORKON_HOME='tempting', HOME='nonsense'), \
             PatchedModule(os.path, exists=fake_exists):
@@ -72,11 +86,7 @@ def test_get_ve_base_not_in_vexrc_workon_home():
     root = vexrc.headings[vexrc.default_heading]
     assert 'virtualenvs' not in root
 
-    def fake_exists(path):
-        if path == '/workon/home':
-            return True
-        return False
-
+    fake_exists = make_fake_exists(['/workon/home'])
     with FakeEnviron(WORKON_HOME='tempting', HOME='nonsense'), \
             PatchedModule(os.path, exists=fake_exists):
         environ = {'WORKON_HOME': '/workon/home', 'HOME': '/bad'}
@@ -88,11 +98,7 @@ def test_get_ve_base_not_in_vexrc_home():
     root = vexrc.headings[vexrc.default_heading]
     assert 'virtualenvs' not in root
 
-    def fake_exists(path):
-        if path in ('/home/user', '/home/user/.virtualenvs'):
-            return True
-        return False
-
+    fake_exists = make_fake_exists(['/home/user', '/home/user/.virtualenvs'])
     with FakeEnviron(WORKON_HOME='tempting', HOME='nonsense'), \
             PatchedModule(os.path, exists=fake_exists):
         environ = {'HOME': '/home/user'}
