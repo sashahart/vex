@@ -56,7 +56,7 @@ class Run(object):
             self.command_found = False
             process = None
         else:
-            if self.timer:
+            if self.timeout is not None:
                 self.timer = Timer(self.timeout, self.kill)
                 self.timer.start()
             self.command_found = True
