@@ -66,9 +66,6 @@ class Run(object):
     def kill(self):
         self.process.kill()
 
-    def poll(self):
-        self.returned = self.process.poll()
-
     def finish(self, inp=None):
         assert inp is None or isinstance(inp, bytes)
         if self.process:

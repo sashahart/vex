@@ -168,10 +168,8 @@ def get_cwd(options):
 def get_virtualenv_path(options, vexrc, environ):
     """Find a virtualenv path.
     """
-    ve_path = options.path
-    ve_name = None
-    if ve_path:
-        ve_name = os.path.basename(os.path.normpath(ve_path))
+    if options.path:
+        ve_path = options.path
     else:
         ve_base = vexrc.get_ve_base(environ)
         if not ve_base:
@@ -199,9 +197,6 @@ def get_virtualenv_path(options, vexrc, environ):
                 'To run in a virtualenv by its path, '
                 'use "vex --path {0}"'.format(ve_path))
 
-    if not ve_path:
-        raise InvalidVirtualenv(
-            "could not find a virtualenv name in the command line.")
     ve_path = os.path.abspath(ve_path)
     if not os.path.exists(ve_path):
         raise InvalidVirtualenv("no virtualenv found at {0!r}.".format(ve_path))

@@ -37,8 +37,6 @@ def get_environ(environ, defaults, ve_path):
         ve_bin = os.path.join(ve_path, 'Scripts')
     else:
         ve_bin = os.path.join(ve_path, 'bin')
-    if not ve_bin:
-        raise BadConfigError('ve_bin must be set')
 
     # I don't expect this to fail, but I'd rather be slightly paranoid and fail
     # early before putting a nonexistent path on PATH.
