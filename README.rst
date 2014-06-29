@@ -389,6 +389,9 @@ This could be put in, e.g., ``~/.zshrc``.
 
    eval "$(vex --shell-config zsh)"
 
+If you did not already enable zsh completion, your .zshrc file should do that
+before this will work, using e.g. 'autoload compinit; compinit'. The symptom of
+this problem will be something like 'command not found: compdef'.
 
 fish
 ----
