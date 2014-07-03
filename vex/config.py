@@ -90,7 +90,7 @@ class Vexrc(object):
             ve_base = environ.get('WORKON_HOME', '')
         if not ve_base:
             # On Cygwin os.name == 'posix' and we want $HOME.
-            if platform.system == 'Windows' and os.name == 'nt':
+            if platform.system() == 'Windows' and os.name == 'nt':
                 _win_drive = environ.get('HOMEDRIVE')
                 home = environ.get('HOMEPATH', '')
                 if home:
