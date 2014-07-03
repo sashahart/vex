@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 import os
 import sys
+import time
 import logging
 from threading import Timer
 from subprocess import Popen, PIPE
@@ -38,13 +39,13 @@ class Run(object):
         self.out = None
         self.err = None
 
-    def __enter__(self):
-        process = None
+    def start(self):
         env = self.env.copy()
         path = os.environ['PATH']
         if isinstance(path, bytes):
             path = path.decode('utf-8')
         env['PATH'] = path
+        process = None
         try:
             args = ['vex'] + self.args
             logging.debug("ARGS %r env %r", args, env)
@@ -61,10 +62,17 @@ class Run(object):
                 self.timer.start()
             self.command_found = True
             self.process = process
+
+    def __enter__(self):
+        self.start()
         return self
 
     def kill(self):
         self.process.kill()
+
+    def poll(self):
+        self.process.poll()
+        self.returned = self.process.returncode
 
     def finish(self, inp=None):
         assert inp is None or isinstance(inp, bytes)
@@ -94,7 +102,7 @@ def test_runs_without_args():
     with Run([], timeout=0.5) as run:
         run.finish()
         assert run.command_found is True, run.command_found
-        assert run.returned != 0
+        assert run.returned == 1
 
 
 def test_help():
@@ -110,27 +118,48 @@ def test_help():
         assert not run.err, "unexpected presence of output on stderr"
 
 
-def test_shell_config_no_arg():
-    """vex --shell-config
+class TestShellConfig(object):
 
-    Non-traceback error.
-    """
-    with Run(['--shell-config'], timeout=0.5) as run:
-        run.finish()
-        assert not run.out
-        assert run.err
-        assert not run.err.startswith(b'Traceback')
+    def test_no_arg(self):
+        """vex --shell-config
 
+        Non-traceback error.
+        """
+        with Run(['--shell-config'], timeout=0.5) as run:
+            run.finish()
+            assert not run.out
+            assert run.err
+            assert not run.err.startswith(b'Traceback')
 
-def test_shell_config():
-    """vex --shell-config bash
+    def test_bash(self):
+        """vex --shell-config bash
 
-    Emits something and doesn't crash
-    """
-    with Run(['--shell-config', 'bash'], timeout=0.5) as run:
-        run.finish()
-        assert run.out
-        assert not run.err
+        Emits something and doesn't crash
+        """
+        with Run(['--shell-config', 'bash'], timeout=0.5) as run:
+            run.finish()
+            assert run.out
+            assert not run.err
+
+    def test_zsh(self):
+        """vex --shell-config zsh
+
+        Emits something and doesn't crash
+        """
+        with Run(['--shell-config', 'zsh'], timeout=0.5) as run:
+            run.finish()
+            assert run.out
+            assert not run.err
+
+    def test_fish(self):
+        """vex --shell-config fish
+
+        Emits something and doesn't crash
+        """
+        with Run(['--shell-config', 'fish'], timeout=0.5) as run:
+            run.finish()
+            assert run.out
+            assert not run.err
 
 
 def test_find_with_HOME():
@@ -193,7 +222,7 @@ class TestWithVirtualenv(object):
         with Run([self.venv.path, 'echo', 'foo']) as run:
             run.finish()
             assert run.command_found
-            assert run.returned != 0
+            assert run.returned == 1
             assert run.out != b'foo\n'
             assert b'Traceback' not in run.err
             assert b'AssertionError' not in run.err
@@ -315,4 +344,4 @@ class TestWithVirtualenv(object):
             assert run.command_found
             assert run.err
             assert not run.err.startswith(b'Traceback')
-            assert run.returned != 0
+            assert run.returned == 1
