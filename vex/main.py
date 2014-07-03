@@ -177,6 +177,7 @@ def get_virtualenv_path(options, vexrc, environ):
                 "could not figure out a virtualenvs directory. "
                 "make sure $HOME is set, or $WORKON_HOME,"
                 " or set virtualenvs=something in your .vexrc")
+        # Using this requires get_ve_base to pass through nonexistent dirs
         if not os.path.exists(ve_base):
             raise NoVirtualenvsDirectory(
                 "virtualenvs directory {0!r} not found.".format(ve_base))
