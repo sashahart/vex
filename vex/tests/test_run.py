@@ -2,8 +2,11 @@ from __future__ import unicode_literals
 import os
 import os.path
 import subprocess
+import platform
+from mock import patch
+from pytest import raises
 from vex import run
-from . fakes import FakeEnviron, PatchedModule, FakePopen, Object
+from . fakes import FakeEnviron, PatchedModule, FakePopen
 
 
 def test_get_environ():
@@ -50,3 +53,101 @@ def test_run():
         assert mod.Popen.env == env
         assert mod.Popen.cwd == cwd
         assert returncode == 888
+
+
+def test_run_bad_command():
+    env = os.environ.copy()
+    returncode = run.run('blah_unlikely', env=env,  cwd='.')
+    assert returncode is None
+
+
+class TestGetEnviron(object):
+    def test_ve_path_None(self):
+        with raises(run.BadConfigError):
+            run.get_environ({}, {}, None)
+
+    def test_ve_path_empty_string(self):
+        with raises(run.BadConfigError):
+            run.get_environ({}, {}, '')
+
+    def test_ve_bin_path_does_not_exist(self):
+
+        yay = 'yay'
+        yay_bin = os.path.join(yay, 'bin')
+
+        def fake_exists(path):
+            if path in (yay, yay_bin):
+                return True
+            return False
+
+        with patch('os.path.exists', wraps=fake_exists):
+            with raises(run.BadConfigError):
+                run.get_environ({}, {}, 'yak')
+            run.get_environ({}, {}, 'yay')
+
+    def test_copies_original(self):
+        original = {'foo': 'bar'}
+        defaults = {}
+        ve_path = 'blah'
+        with patch('os.path.exists', return_value=True):
+            environ = run.get_environ(original, defaults, ve_path)
+        assert environ is not original
+        assert environ.get('foo') == 'bar'
+
+    def test_updates_with_defaults(self):
+        original = {'foo': 'bar', 'yak': 'nope'}
+        defaults = {'bam': 'pow', 'yak': 'fur'}
+        ve_path = 'blah'
+        with patch('os.path.exists', return_value=True):
+            environ = run.get_environ(original, defaults, ve_path)
+        assert environ.get('bam') == 'pow'
+        assert environ.get('yak') == 'fur'
+
+    def test_ve_path(self):
+        original = {'foo': 'bar'}
+        defaults = {}
+        ve_path = 'blah'
+        with patch('os.path.exists'):
+            environ = run.get_environ(original, defaults, ve_path)
+        assert environ.get('VIRTUAL_ENV') == ve_path
+
+    def test_prefixes_PATH(self):
+        original = {'foo': 'bar'}
+        defaults = {}
+        ve_path = 'fnood'
+        bin_path = os.path.join(ve_path, 'bin')
+        with patch('os.path.exists', return_value=True):
+            environ = run.get_environ(original, defaults, ve_path)
+        PATH = environ.get('PATH', '')
+        paths = PATH.split(os.pathsep)
+        assert paths[0] == bin_path
+
+    def test_removes_old_virtualenv_bin_path(self):
+        new = 'new'
+        old = 'old'
+        original = {'foo': 'bar', 'VIRTUALENV': old}
+        defaults = {}
+        new_bin = os.path.join(new, 'bin')
+        old_bin = os.path.join(old, 'bin')
+        with patch('os.path.exists', return_value=True):
+            environ = run.get_environ(original, defaults, new)
+        PATH = environ.get('PATH', '')
+        paths = PATH.split(os.pathsep)
+        assert paths[0] == new_bin
+        assert old_bin not in paths
+
+    def test_fake_windows_env(self):
+        # does not simulate different os.pathsep, etc.
+        # just tests using Script instead of bin, for coverage.
+        original = {'foo': 'bar'}
+        defaults = {}
+        ve_path = 'fnard'
+        bin_path = os.path.join(ve_path, 'Scripts')
+        with patch('platform.system', return_value='Windows'), \
+             patch('os.path.exists', return_value=True):
+            assert platform.system() == 'Windows'
+            environ = run.get_environ(original, defaults, ve_path)
+        assert environ.get('VIRTUAL_ENV') == ve_path
+        PATH = environ.get('PATH', '')
+        paths = PATH.split(os.pathsep)
+        assert paths[0] == bin_path

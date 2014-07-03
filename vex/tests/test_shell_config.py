@@ -1,4 +1,67 @@
-from vex.shell_config import scary_path as scary
+from vex.config import Vexrc
+from vex.shell_config import scary_path as scary, shell_config_for
+from mock import patch
+
+
+class TestShellConfigFor(object):
+    def test_unknown_shell(self):
+        vexrc = Vexrc()
+        output = shell_config_for('unlikely_name', vexrc, {})
+        assert output.strip() == b''
+
+    def test_bash_config(self):
+        vexrc = Vexrc()
+        output = shell_config_for("bash", vexrc, {})
+        assert output
+
+    def test_zsh_config(self):
+        vexrc = Vexrc()
+        output = shell_config_for("zsh", vexrc, {})
+        assert output
+
+    def test_fish_config(self):
+        vexrc = Vexrc()
+        output = shell_config_for("fish", vexrc, {})
+        assert output
+
+    def test_bash_config_not_scary(self):
+        vexrc = Vexrc()
+        with patch('os.path.exists', returnvalue=True):
+            output = shell_config_for("bash", vexrc, {'WORKON_HOME': '/hoorj'})
+        assert output
+        assert b'/hoorj' in output
+
+    def test_zsh_config_not_scary(self):
+        vexrc = Vexrc()
+        with patch('os.path.exists', returnvalue=True):
+            output = shell_config_for("zsh", vexrc, {'WORKON_HOME': '/hoorj'})
+        assert output
+        assert b'/hoorj' in output
+
+    def test_fish_config_not_scary(self):
+        vexrc = Vexrc()
+        with patch('os.path.exists', returnvalue=True):
+            output = shell_config_for("fish", vexrc, {'WORKON_HOME': '/hoorj'})
+        assert output
+        assert b'/hoorj' in output
+
+    def test_bash_config_scary(self):
+        vexrc = Vexrc()
+        output = shell_config_for("bash", vexrc, {'WORKON_HOME': '$x'})
+        assert output
+        assert b'$x' not in output
+
+    def test_zsh_config_scary(self):
+        vexrc = Vexrc()
+        output = shell_config_for("zsh", vexrc, {'WORKON_HOME': '$x'})
+        assert output
+        assert b'$x' not in output
+
+    def test_fish_config_scary(self):
+        vexrc = Vexrc()
+        output = shell_config_for("fish", vexrc, {'WORKON_HOME': '$x'})
+        assert output
+        assert b'$x' not in output
 
 
 class TestNotScary(object):
