@@ -1,7 +1,6 @@
 import os
 from io import BytesIO
 from mock import patch
-from pytest import raises
 from vex import config
 from . fakes import FakeEnviron, PatchedModule
 
