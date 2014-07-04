@@ -8,8 +8,10 @@ from . fakes import FakeEnviron, PatchedModule
 
 TYPICAL_VEXRC = """
 shell=bash
+
 env:
     ANSWER=42
+
 arbitrary:
     x=y
 """.lstrip().encode('utf-8')

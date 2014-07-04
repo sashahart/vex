@@ -157,6 +157,8 @@ def parse_vexrc(inp, environ):
     with inp:
         for line_number, line in enumerate(inp):
             line = line.decode("utf-8")
+            if not line.strip():
+                continue
             extracted_heading = extract_heading(line)
             if extracted_heading is not None:
                 heading = extracted_heading
