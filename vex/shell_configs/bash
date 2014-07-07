@@ -5,7 +5,7 @@ _vex_virtualenvs () {
 }
 
 _vex_position() {
-	local take_args='--config|--path|--cwd'
+	local take_args='--config|--path|--cwd|--python'
 	local i cur prev count=0
 	for ((i=1; $i<=$COMP_CWORD; i++)); do
 		cur="${COMP_WORDS[i]}"
@@ -35,6 +35,9 @@ _vex() {
 				;;
 			--path|--cwd)
 				COMPREPLY=( $(compgen -d "${cur}") )
+				;;
+			--python)
+				COMPREPLY=( $(compgen -o bashdefault -c "${cur}") )
 				;;
 			*)
 				if [[ "${cur}" == -* ]]; then
