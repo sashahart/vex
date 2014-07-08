@@ -6,6 +6,7 @@ import platform
 from mock import patch
 from pytest import raises
 from vex import run
+from vex import exceptions
 from . fakes import FakeEnviron, PatchedModule, FakePopen
 
 
@@ -63,11 +64,11 @@ def test_run_bad_command():
 
 class TestGetEnviron(object):
     def test_ve_path_None(self):
-        with raises(run.BadConfigError):
+        with raises(exceptions.BadConfig):
             run.get_environ({}, {}, None)
 
     def test_ve_path_empty_string(self):
-        with raises(run.BadConfigError):
+        with raises(exceptions.BadConfig):
             run.get_environ({}, {}, '')
 
     def test_ve_bin_path_does_not_exist(self):
@@ -81,7 +82,7 @@ class TestGetEnviron(object):
             return False
 
         with patch('os.path.exists', wraps=fake_exists):
-            with raises(run.BadConfigError):
+            with raises(exceptions.BadConfig):
                 run.get_environ({}, {}, 'yak')
             run.get_environ({}, {}, 'yay')
 

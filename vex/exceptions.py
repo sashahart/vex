@@ -1,3 +1,6 @@
+import sys
+
+
 class InvalidArgument(Exception):
     """Raised by anything under main() to propagate errors to user.
     """
@@ -54,3 +57,15 @@ class InvalidCwd(InvalidArgument):
     """cwd specified or required but unusable.
     """
     pass
+
+
+class BadConfig(InvalidArgument):
+    """raised to halt on fatal conditions on the way to run.
+    """
+    pass
+
+
+if sys.version_info > (3, 3):
+    CommandNotFoundError = FileNotFoundError
+else:
+    CommandNotFoundError = OSError

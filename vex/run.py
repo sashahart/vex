@@ -1,20 +1,9 @@
 """Run subprocess.
 """
 import os
-import sys
 import platform
 import subprocess
-
-if sys.version_info > (3, 3):
-    CommandNotFoundError = FileNotFoundError
-else:
-    CommandNotFoundError = OSError
-
-
-class BadConfigError(Exception):
-    """raised to halt on fatal conditions on the way to run.
-    """
-    pass
+from vex import exceptions
 
 
 def get_environ(environ, defaults, ve_path):
@@ -32,7 +21,7 @@ def get_environ(environ, defaults, ve_path):
     # PATH being unset/empty is OK, but ve_path must be set
     # or there is nothing for us to do here and it's bad.
     if not ve_path:
-        raise BadConfigError('ve_path must be set')
+        raise exceptions.BadConfig('ve_path must be set')
     if platform.system() == 'Windows':
         ve_bin = os.path.join(ve_path, 'Scripts')
     else:
@@ -40,8 +29,9 @@ def get_environ(environ, defaults, ve_path):
 
     # I don't expect this to fail, but I'd rather be slightly paranoid
     # and fail early before putting a nonexistent path on PATH.
+    # this error message sucks and should never be reached.
     if not os.path.exists(ve_bin):
-        raise BadConfigError('ve_bin %r does not exist' % ve_bin)
+        raise exceptions.BadConfig('ve_bin %r does not exist' % ve_bin)
 
     # If user is currently in a virtualenv, DON'T just prepend
     # to its path (vex foo; echo $PATH -> " /foo/bin:/bar/bin")
@@ -76,7 +66,7 @@ def run(command, env, cwd):
     try:
         process = subprocess.Popen(command, env=env, cwd=cwd)
         process.wait()
-    except CommandNotFoundError as error:
+    except exceptions.CommandNotFoundError as error:
         if error.errno != 2:
             raise
         return None
