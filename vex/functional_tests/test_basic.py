@@ -364,3 +364,24 @@ class TestMake(object):
             assert not run.err
             assert os.path.exists(venv_path)
         parent.close()
+
+
+class TestRemove(object):
+    def test_remove(self):
+        parent = TempDir()
+        venv = TempVenv(parent.path, 'vex_tests', [])
+        venv.open()
+        assert os.path.exists(venv.path)
+        assert os.path.exists(parent.path)
+        env = {'WORKON_HOME': parent.path.decode('utf-8')}
+        with Run(['--remove', venv.name, 'echo', '42'], env=env) as run:
+            run.finish()
+            assert run.out is not None
+            assert b'42' in run.out
+            assert run.command_found
+            assert run.returned == 0
+            assert not run.err
+            assert not os.path.exists(venv.path)
+            assert os.path.exists(parent.path)
+        venv.close()
+        parent.close()
