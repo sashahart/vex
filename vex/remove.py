@@ -5,20 +5,13 @@ from vex import exceptions
 
 def obviously_not_a_virtualenv(path):
     include = os.path.join(path, 'include')
-    lib = os.path.join(path, 'lib')
     bin = os.path.join(path, 'bin')
     scripts = os.path.join(path, 'Scripts')
-    if not os.path.exists(include):
-        return True
-    if not os.path.exists(lib):
-        return True
     if not os.path.exists(bin) or os.path.exists(scripts):
         return True
-    if not any(filename.startswith('python')
-               for filename in os.listdir(include)):
+    if not os.path.exists(include):
         return True
-    if not any(filename.startswith('python')
-               for filename in os.listdir(lib)):
+    if not any(filename.startswith('py') for filename in os.listdir(include)):
         return True
     return False
 
