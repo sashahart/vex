@@ -109,38 +109,44 @@ def get_cwd(options):
     return options.cwd
 
 
-def get_virtualenv_path(options, vexrc, environ):
-    """Find a virtualenv path.
-    """
+def get_virtualenv_name(options):
     if options.path:
-        ve_path = options.path
+        return os.path.dirname(options.path)
     else:
-        ve_base = vexrc.get_ve_base(environ)
-        if not ve_base:
-            raise exceptions.NoVirtualenvsDirectory(
-                "could not figure out a virtualenvs directory. "
-                "make sure $HOME is set, or $WORKON_HOME,"
-                " or set virtualenvs=something in your .vexrc")
-        # Using this requires get_ve_base to pass through nonexistent dirs
-        if not os.path.exists(ve_base):
-            raise exceptions.NoVirtualenvsDirectory(
-                "virtualenvs directory {0!r} not found.".format(ve_base))
         ve_name = options.rest.pop(0) if options.rest else ''
-        if not ve_name:
-            raise exceptions.NoVirtualenvName(
-                "could not find a virtualenv name in the command line."
-            )
+    if not ve_name:
+        raise exceptions.NoVirtualenvName(
+            "could not find a virtualenv name in the command line."
+        )
+    return ve_name
 
-        # n.b.: if ve_name is absolute, ve_base is discarded by os.path.join,
-        # and an absolute path will be accepted as first arg.
-        # So we check if they gave an absolute path as ve_name.
-        # But we don't want this error if $PWD == $WORKON_HOME,
-        # in which case 'foo' is a valid relative path to virtualenv foo.
-        ve_path = os.path.join(ve_base, ve_name)
-        if ve_path == ve_name and os.path.basename(ve_name) != ve_name:
-            raise exceptions.InvalidVirtualenv(
-                'To run in a virtualenv by its path, '
-                'use "vex --path {0}"'.format(ve_path))
+
+def get_virtualenv_path(ve_base, ve_name):
+    """Check a virtualenv path, raising exceptions to explain problems.
+    """
+    if not ve_base:
+        raise exceptions.NoVirtualenvsDirectory(
+            "could not figure out a virtualenvs directory. "
+            "make sure $HOME is set, or $WORKON_HOME,"
+            " or set virtualenvs=something in your .vexrc")
+    # Using this requires get_ve_base to pass through nonexistent dirs
+    if not os.path.exists(ve_base):
+        raise exceptions.NoVirtualenvsDirectory(
+            "virtualenvs directory {0!r} not found.".format(ve_base))
+
+    if not ve_name:
+        raise exceptions.InvalidVirtualenv("no virtualenv name")
+
+    # n.b.: if ve_name is absolute, ve_base is discarded by os.path.join,
+    # and an absolute path will be accepted as first arg.
+    # So we check if they gave an absolute path as ve_name.
+    # But we don't want this error if $PWD == $WORKON_HOME,
+    # in which case 'foo' is a valid relative path to virtualenv foo.
+    ve_path = os.path.join(ve_base, ve_name)
+    if ve_path == ve_name and os.path.basename(ve_name) != ve_name:
+        raise exceptions.InvalidVirtualenv(
+            'To run in a virtualenv by its path, '
+            'use "vex --path {0}"'.format(ve_path))
 
     ve_path = os.path.abspath(ve_path)
     if not os.path.exists(ve_path):
@@ -178,13 +184,19 @@ def _main(environ, argv):
     # Handle --shell-config as soon as its arguments are available.
     if options.shell_to_configure:
         return handle_shell_config(options, vexrc, environ)
+    # get_virtualenv_name is destructive and must happen before get_command
     cwd = get_cwd(options)
-    try:
-        ve_path = get_virtualenv_path(options, vexrc, environ)
-    except exceptions.NoVirtualenvName:
-        options.print_help()
-        raise
+    ve_base = vexrc.get_ve_base(environ)
+    ve_name = get_virtualenv_name(options)
     command = get_command(options, vexrc, environ)
+    if options.path:
+        ve_path = os.path.abspath(options.path)
+    else:
+        try:
+            ve_path = get_virtualenv_path(ve_base, ve_name)
+        except exceptions.NoVirtualenvName:
+            options.print_help()
+            raise
     # get_environ has to wait until ve_path is defined, which might
     # be after a make; of course we can't run until we have env.
     env = get_environ(environ, vexrc['env'], ve_path)

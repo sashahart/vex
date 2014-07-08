@@ -2,7 +2,7 @@ import os
 from io import BytesIO
 from mock import patch
 from vex import config
-from . fakes import FakeEnviron, PatchedModule
+from . fakes import FakeEnviron, PatchedModule, make_fake_exists
 
 
 TYPICAL_VEXRC = """

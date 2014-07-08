@@ -6,7 +6,7 @@ from mock import patch
 from vex import main
 from vex.config import Vexrc
 from vex import exceptions
-from . fakes import Object
+from . fakes import Object, make_fake_exists
 
 
 def test_make_arg_parser():
@@ -72,68 +72,37 @@ class TestGetCwd(object):
 
 
 class TestGetVirtualenvPath(object):
-    # def test_path_is_None(self):
-        # options = argparse.Namespace(path=None)
 
-    def test_path_not_given_no_virtualenvs_directory(self):
-        options = argparse.Namespace(path=None)
-        vexrc = Vexrc()
-        environ = {'WORKON_HOME': '', 'HOME': ''}
-        with patch('vex.config.Vexrc.get_ve_base', return_value=''), \
-           raises(exceptions.NoVirtualenvsDirectory):
-            assert vexrc.get_ve_base(environ) == ''
-            main.get_virtualenv_path(options, vexrc, environ)
-
-    def test_path_not_given_nonexistent_virtualenvs_directory(self):
-        options = argparse.Namespace(path=None)
-        vexrc = Vexrc()
-        environ = {'WORKON_HOME': 'very_unlikely_to_exist', 'HOME': ''}
+    def test_no_ve_base(self):
         with raises(exceptions.NoVirtualenvsDirectory):
-            main.get_virtualenv_path(options, vexrc, environ)
+            main.get_virtualenv_path("", "anything")
 
-    def test_path_given_in_rest(self):
-        options = argparse.Namespace(path=None, rest=['moo'])
-        vexrc = Vexrc()
-        ve_base = '/tmp'  # urgh
-        environ = {'WORKON_HOME': ve_base}
-        assert vexrc.get_ve_base(environ) == ve_base
-        assert os.path.exists(ve_base)
-        with patch('os.path.exists', return_value=True):
-            path = main.get_virtualenv_path(options, vexrc, environ)
-        assert path.endswith(os.path.join('tmp', 'moo'))
+    def test_nonexistent_ve_base(self):
+        with raises(exceptions.NoVirtualenvsDirectory):
+            main.get_virtualenv_path("/unlikely_to_exist1", "anything")
 
-    def test_path_not_given_no_rest(self):
-        options = argparse.Namespace(path=None, rest=[])
-        vexrc = Vexrc()
-        environ = {}
-        with raises(exceptions.NoVirtualenvName):
-            main.get_virtualenv_path(options, vexrc, environ)
+    def test_no_ve_name(self):
+        fake_path = os.path.abspath(os.path.join('pretends_to_exist'))
+        fake_exists = make_fake_exists([fake_path])
+        with patch('os.path.exists', wraps=fake_exists), \
+          raises(exceptions.InvalidVirtualenv):
+            main.get_virtualenv_path(fake_path, "")
 
-    def test_path_given_but_nonexistent(self):
-        options = argparse.Namespace(path='very_unlikely_to_exist', rest=[])
-        vexrc = Vexrc()
-        environ = {}
-        with raises(exceptions.InvalidVirtualenv):
-            main.get_virtualenv_path(options, vexrc, environ)
+    def test_nonexistent_ve_path(self):
+        fake_path = os.path.abspath(os.path.join('pretends_to_exist'))
+        fake_exists = make_fake_exists([fake_path])
+        with patch('os.path.exists', wraps=fake_exists), \
+          raises(exceptions.InvalidVirtualenv):
+            main.get_virtualenv_path(fake_path, "/unlikely_to_exist2")
 
-    def test_path_given_and_exists(self):
-        pretends_to_exist = os.sep + os.path.join('tmp', 'pretends_to_exist')
-        options = argparse.Namespace(path=pretends_to_exist, rest=[])
-        vexrc = Vexrc()
-        environ = {}
-        with patch('os.path.exists', return_value=True):
-            path = main.get_virtualenv_path(options, vexrc, environ)
-            assert path == pretends_to_exist
-
-    def test_path_given_and_relative(self):
-        pretends_to_exist = 'pretends_to_exist'
-        options = argparse.Namespace(path=pretends_to_exist)
-        vexrc = Vexrc()
-        environ = {}
-        with patch('os.path.exists', return_value=True):
-            path = main.get_virtualenv_path(options, vexrc, environ)
-            abspath = os.path.abspath(pretends_to_exist)
-            assert path == abspath
+    def test_happy(self):
+        fake_base = os.path.abspath(os.path.join('pretends_to_exist'))
+        fake_name = 'also_pretend'
+        fake_path = os.path.join(fake_base, fake_name)
+        fake_exists = make_fake_exists([fake_base, fake_path])
+        with patch('os.path.exists', wraps=fake_exists):
+            path = main.get_virtualenv_path(fake_base, fake_name)
+            assert path == fake_path
 
 
 class TestGetCommand(object):
