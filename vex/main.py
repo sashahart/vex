@@ -5,6 +5,7 @@ import os
 import argparse
 from vex import config
 from vex.run import get_environ, run
+from vex.shell_config import handle_shell_config
 from vex import exceptions
 
 
@@ -81,21 +82,6 @@ def get_vexrc(options, environ):
     filename = options.config or os.path.expanduser('~/.vexrc')
     vexrc = config.Vexrc.from_file(filename, environ)
     return vexrc
-
-
-def handle_shell_config(options, vexrc, environ):
-    """Carry out the logic of the --shell-config option.
-    """
-    from vex import shell_config
-    data = shell_config.shell_config_for(
-        options.shell_to_configure, vexrc, environ)
-    if not data:
-        raise exceptions.OtherShell("unknown shell: " + options.shell_to_configure)
-    if hasattr(sys.stdout, 'buffer'):
-        sys.stdout.buffer.write(data)
-    else:
-        sys.stdout.write(data)
-    return 0
 
 
 def get_cwd(options):
@@ -183,7 +169,7 @@ def _main(environ, argv):
     vexrc = get_vexrc(options, environ)
     # Handle --shell-config as soon as its arguments are available.
     if options.shell_to_configure:
-        return handle_shell_config(options, vexrc, environ)
+        return handle_shell_config(options.shell_to_configure, vexrc, environ)
     # get_virtualenv_name is destructive and must happen before get_command
     cwd = get_cwd(options)
     ve_base = vexrc.get_ve_base(environ)

@@ -4,7 +4,10 @@ It just lets us provide a convenient mechanism for people
 with popular shells to set up autocompletion.
 """
 import os
+import sys
 import re
+from vex import exceptions
+
 
 try:
     FileNotFoundError
@@ -45,3 +48,17 @@ def shell_config_for(shell, vexrc, environ):
         assert os.path.exists(ve_base)
         data = data.replace(b'$WORKON_HOME', ve_base)
     return data
+
+
+def handle_shell_config(shell, vexrc, environ):
+    """Carry out the logic of the --shell-config option.
+    """
+    from vex import shell_config
+    data = shell_config.shell_config_for(shell, vexrc, environ)
+    if not data:
+        raise exceptions.OtherShell("unknown shell: {0!r}".format(shell))
+    if hasattr(sys.stdout, 'buffer'):
+        sys.stdout.buffer.write(data)
+    else:
+        sys.stdout.write(data)
+    return 0
