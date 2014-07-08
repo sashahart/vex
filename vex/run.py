@@ -38,8 +38,8 @@ def get_environ(environ, defaults, ve_path):
     else:
         ve_bin = os.path.join(ve_path, 'bin')
 
-    # I don't expect this to fail, but I'd rather be slightly paranoid and fail
-    # early before putting a nonexistent path on PATH.
+    # I don't expect this to fail, but I'd rather be slightly paranoid
+    # and fail early before putting a nonexistent path on PATH.
     if not os.path.exists(ve_bin):
         raise BadConfigError('ve_bin %r does not exist' % ve_bin)
 
