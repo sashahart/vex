@@ -9,24 +9,6 @@ from vex import exceptions
 from . fakes import Object, make_fake_exists
 
 
-def test_make_arg_parser():
-    # just exercises code for coverage
-    parser = main.make_arg_parser()
-    assert parser
-
-
-class TestGetOptions(object):
-    def test_get_options(self):
-        options = main.get_options(['--cwd', 'whatever'])
-        assert options.cwd == 'whatever'
-
-    def test_get_options_unknown(self):
-        try:
-            main.get_options(['--unlikely-to-be-used'])
-        except exceptions.UnknownArguments as error:
-            assert "--unlikely-to-be-used" in str(error)
-
-
 class TestGetVexrc(object):
     def test_get_vexrc_nonexistent(self):
         options = main.get_options(['--config', 'unlikely_to_exist'])
