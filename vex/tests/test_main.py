@@ -5,6 +5,7 @@ from pytest import raises
 from mock import patch
 from vex import main
 from vex.config import Vexrc
+from vex import exceptions
 from . fakes import Object
 
 
@@ -22,7 +23,7 @@ class TestGetOptions(object):
     def test_get_options_unknown(self):
         try:
             main.get_options(['--unlikely-to-be-used'])
-        except main.UnknownArguments as error:
+        except exceptions.UnknownArguments as error:
             assert "--unlikely-to-be-used" in str(error)
 
 
@@ -31,7 +32,7 @@ class TestGetVexrc(object):
         options = main.get_options(['--config', 'unlikely_to_exist'])
         try:
             main.get_vexrc(options, {})
-        except main.InvalidVexrc as error:
+        except exceptions.InvalidVexrc as error:
             assert 'unlikely_to_exist' in str(error)
 
 
@@ -60,7 +61,7 @@ class TestGetCwd(object):
         with patch('os.path.exists', return_value=False):
             try:
                 main.get_cwd(options)
-            except main.InvalidCwd:
+            except exceptions.InvalidCwd:
                 pass
 
     def test_get_cwd(self):
@@ -79,7 +80,7 @@ class TestGetVirtualenvPath(object):
         vexrc = Vexrc()
         environ = {'WORKON_HOME': '', 'HOME': ''}
         with patch('vex.config.Vexrc.get_ve_base', return_value=''), \
-           raises(main.NoVirtualenvsDirectory):
+           raises(exceptions.NoVirtualenvsDirectory):
             assert vexrc.get_ve_base(environ) == ''
             main.get_virtualenv_path(options, vexrc, environ)
 
@@ -87,7 +88,7 @@ class TestGetVirtualenvPath(object):
         options = argparse.Namespace(path=None)
         vexrc = Vexrc()
         environ = {'WORKON_HOME': 'very_unlikely_to_exist', 'HOME': ''}
-        with raises(main.NoVirtualenvsDirectory):
+        with raises(exceptions.NoVirtualenvsDirectory):
             main.get_virtualenv_path(options, vexrc, environ)
 
     def test_path_given_in_rest(self):
@@ -105,14 +106,14 @@ class TestGetVirtualenvPath(object):
         options = argparse.Namespace(path=None, rest=[])
         vexrc = Vexrc()
         environ = {}
-        with raises(main.NoVirtualenvName):
+        with raises(exceptions.NoVirtualenvName):
             main.get_virtualenv_path(options, vexrc, environ)
 
     def test_path_given_but_nonexistent(self):
         options = argparse.Namespace(path='very_unlikely_to_exist', rest=[])
         vexrc = Vexrc()
         environ = {}
-        with raises(main.InvalidVirtualenv):
+        with raises(exceptions.InvalidVirtualenv):
             main.get_virtualenv_path(options, vexrc, environ)
 
     def test_path_given_and_exists(self):
@@ -161,12 +162,12 @@ class TestGetCommand(object):
         vexrc = Vexrc()
         options = argparse.Namespace(rest=None)
         environ = {}
-        with raises(main.InvalidCommand):
+        with raises(exceptions.InvalidCommand):
             main.get_command(options, vexrc, environ)
 
     def test_flag(self):
         vexrc = Vexrc()
         options = argparse.Namespace(rest=['--foo'])
         environ = {}
-        with raises(main.InvalidCommand):
+        with raises(exceptions.InvalidCommand):
             main.get_command(options, vexrc, environ)
