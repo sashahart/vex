@@ -345,3 +345,22 @@ class TestWithVirtualenv(object):
             assert run.err
             assert not run.err.startswith(b'Traceback')
             assert run.returned == 1
+
+
+class TestMake(object):
+    def test_make(self):
+        parent = TempDir()
+        venv_name = b'make_test'
+        venv_path = os.path.join(parent.path, venv_name)
+        assert not os.path.exists(venv_path)
+        assert os.path.exists(parent.path)
+        env = {'WORKON_HOME': parent.path.decode('utf-8')}
+        with Run(['--make', venv_name, 'echo', '42'], env=env) as run:
+            run.finish()
+            assert run.out is not None
+            assert b'42' in run.out
+            assert run.command_found
+            assert run.returned == 0
+            assert not run.err
+            assert os.path.exists(venv_path)
+        parent.close()
