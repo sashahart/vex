@@ -33,6 +33,13 @@ def make_arg_parser():
         action="store_true",
     )
 
+    remove = parser.add_argument_group(title='To remove a virtualenv')
+    remove.add_argument(
+        '-r', '--remove',
+        action="store_true",
+        help="remove the named virtualenv after running command"
+    )
+
     parser.add_argument(
         "--path",
         metavar="DIR",
