@@ -256,10 +256,9 @@ def main():
     returncode = 1
     try:
         returncode = _main(os.environ, argv)
-    except NoVirtualenvName:
-        sys.stderr.write("\n")
-        sys.stderr.write("Error: no virtualenv name found in command line.\n")
     except InvalidArgument as error:
         if error.message:
             sys.stderr.write("Error: " + error.message + '\n')
+        else:
+            raise
     sys.exit(returncode)
