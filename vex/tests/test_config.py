@@ -21,28 +21,6 @@ b='{SHELL}'
 """.lstrip().encode('utf-8')
 
 
-def make_fake_exists(accepted_paths):
-    """Make functions which only return true for a particular string.
-    """
-    # Easy mistake to make, don't want to handle multiple signatures
-    assert not isinstance(accepted_paths, str)
-
-    def fake_exists(path):
-        if path in accepted_paths:
-            return True
-        return False
-
-    return fake_exists
-
-
-def test_make_fake_exists():
-    """Test that make_fake_exists itself works as intended.
-    """
-    fake_exists = make_fake_exists(['/special'])
-    assert fake_exists('/special')
-    assert not fake_exists('/dev')
-
-
 class TestExtractHeading(object):
     """Make sure extract_heading works as intended.
     """

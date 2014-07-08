@@ -62,3 +62,17 @@ class PatchedModule(object):
         for key, value in self.originals.items():
             setattr(self.module, key, value)
         self.originals = None
+
+
+def make_fake_exists(accepted_paths):
+    """Make functions which only return true for a particular string.
+    """
+    # Easy mistake to make, don't want to handle multiple signatures
+    assert not isinstance(accepted_paths, str)
+
+    def fake_exists(path):
+        if path in accepted_paths:
+            return True
+        return False
+
+    return fake_exists
