@@ -121,7 +121,7 @@ def _main(environ, argv):
     # Either we create ve_path, get it from options.path or find it
     # in ve_base.
     if options.make:
-        make_path = os.path.abspath(os.path.join(ve_base, ve_name))
+        make_path = options.path or os.path.abspath(os.path.join(ve_base, ve_name))
         handle_make(environ, options, make_path)
         ve_path = make_path
     elif options.path:
