@@ -7,6 +7,7 @@ from vex.options import get_options
 from vex.run import get_environ, run
 from vex.shell_config import handle_shell_config
 from vex.make import handle_make
+from vex.remove import handle_remove
 from vex import exceptions
 
 
@@ -143,6 +144,8 @@ def _main(environ, argv):
     # be after a make; of course we can't run until we have env.
     env = get_environ(environ, vexrc['env'], ve_path)
     returncode = run(command, env=env, cwd=cwd)
+    if options.remove:
+        handle_remove(ve_path)
     if returncode is None:
         raise exceptions.InvalidCommand(
             "command not found: {0!r}".format(command[0]))
