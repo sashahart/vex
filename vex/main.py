@@ -6,6 +6,7 @@ from vex import config
 from vex.options import get_options
 from vex.run import get_environ, run
 from vex.shell_config import handle_shell_config
+from vex.make import handle_make
 from vex import exceptions
 
 
@@ -110,12 +111,20 @@ def _main(environ, argv):
     # Handle --shell-config as soon as its arguments are available.
     if options.shell_to_configure:
         return handle_shell_config(options.shell_to_configure, vexrc, environ)
+    # Do as much as possible before a possible make, so errors can raise
+    # without leaving behind an unused virtualenv.
     # get_virtualenv_name is destructive and must happen before get_command
     cwd = get_cwd(options)
     ve_base = vexrc.get_ve_base(environ)
     ve_name = get_virtualenv_name(options)
     command = get_command(options, vexrc, environ)
-    if options.path:
+    # Either we create ve_path, get it from options.path or find it
+    # in ve_base.
+    if options.make:
+        make_path = os.path.abspath(os.path.join(ve_base, ve_name))
+        handle_make(environ, options, make_path)
+        ve_path = make_path
+    elif options.path:
         ve_path = os.path.abspath(options.path)
     else:
         try:
