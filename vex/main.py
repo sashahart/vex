@@ -128,7 +128,7 @@ def get_vexrc(options, environ):
     """Get a representation of the contents of the config file.
 
     :returns:
-            a Vexrc instance.
+        a Vexrc instance.
     """
     # Complain if user specified nonexistent file with --config.
     # But we don't want to complain just because ~/.vexrc doesn't exist.
