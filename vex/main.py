@@ -224,9 +224,13 @@ def get_command(options, vexrc, environ):
 
 def _main(environ, argv):
     """Logic for main(), with less direct system interaction.
+
+    Routines called here raise InvalidArgument with messages that
+    should be delivered on stderr, to be caught by main.
     """
     options = get_options(argv)
     vexrc = get_vexrc(options, environ)
+    # Handle --shell-config as soon as its arguments are available.
     if options.shell_to_configure:
         return handle_shell_config(options, vexrc, environ)
     cwd = get_cwd(options)
@@ -236,6 +240,8 @@ def _main(environ, argv):
         options.print_help()
         raise
     command = get_command(options, vexrc, environ)
+    # get_environ has to wait until ve_path is defined, which might
+    # be after a make; of course we can't run until we have env.
     env = get_environ(environ, vexrc['env'], ve_path)
     returncode = run(command, env=env, cwd=cwd)
     if returncode is None:
