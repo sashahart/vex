@@ -56,10 +56,14 @@ def get_virtualenv_path(ve_base, ve_name):
             "could not figure out a virtualenvs directory. "
             "make sure $HOME is set, or $WORKON_HOME,"
             " or set virtualenvs=something in your .vexrc")
+
     # Using this requires get_ve_base to pass through nonexistent dirs
     if not os.path.exists(ve_base):
-        raise exceptions.NoVirtualenvsDirectory(
-            "virtualenvs directory {0!r} not found.".format(ve_base))
+        message = (
+            "virtualenvs directory {0!r} not found. "
+            "Create it or use vex --make to get started."
+        ).format(ve_base)
+        raise exceptions.NoVirtualenvsDirectory(message)
 
     if not ve_name:
         raise exceptions.InvalidVirtualenv("no virtualenv name")
