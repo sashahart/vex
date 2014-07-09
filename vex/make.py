@@ -10,6 +10,11 @@ cli()
 """.encode('ascii')
 
 
+PYDOC_BATCH = """
+@python -m pydoc %*
+""".encode('ascii')
+
+
 def handle_make(environ, options, make_path):
     if os.path.exists(make_path):
         # Can't ignore existing virtualenv happily because existing one
@@ -52,3 +57,7 @@ def handle_make(environ, options, make_path):
             out.write(PYDOC_SCRIPT)
         perms = os.stat(pydoc_path).st_mode
         os.chmod(pydoc_path, perms | 0o0111)
+    else:
+        pydoc_path = os.path.join(make_path, 'Scripts', 'pydoc.bat')
+        with open(pydoc_path, 'wb') as out:
+            out.write(PYDOC_BATCH)
