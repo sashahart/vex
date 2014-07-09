@@ -1,4 +1,5 @@
 import os
+import sys
 from vex.run import run
 from vex import exceptions
 
@@ -19,7 +20,17 @@ def handle_make(environ, options, make_path):
             "or $WORKON_HOME, or remove the existing file; "
             "then rerun your vex --make command.".format(ve_base)
         )
-    args = ['virtualenv', make_path]
+    # TODO: virtualenv is usually not on PATH for Windows,
+    # but finding it is a terrible issue.
+    if os.name == 'nt' and not os.environ.get('VIRTUAL_ENV', ''):
+        ve = os.path.join(
+            os.path.dirname(sys.executable),
+            'Scripts',
+            'virtualenv'
+        )
+    else:
+        ve = 'virtualenv'
+    args = [ve, make_path]
     if options.python:
         args += ['--python', options.python]
     if options.site_packages:
