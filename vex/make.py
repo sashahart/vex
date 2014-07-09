@@ -11,6 +11,14 @@ def handle_make(environ, options, make_path):
     ve_base = os.path.dirname(make_path)
     if not os.path.exists(ve_base):
         os.mkdir(ve_base)
+    elif not os.path.isdir(ve_base):
+        raise exceptions.VirtualenvNotMade(
+            "could not make virtualenv: "
+            "{0!r} already exists but is not a directory. "
+            "Choose a different virtualenvs path using ~/.vexrc "
+            "or $WORKON_HOME, or remove the existing file; "
+            "then rerun your vex --make command.".format(ve_base)
+        )
     args = ['virtualenv', make_path]
     if options.python:
         args += ['--python', options.python]
