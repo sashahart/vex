@@ -88,6 +88,12 @@ Try it out.
 ``vex foo powershell``
     On Windows, this launches a PowerShell instance using virtualenv foo.
 
+``vex -mr ephemeral``
+    In one command, this creates a virtualenv named ephemeral, then runs
+    a shell (since there was no argument), then after that shell exits, vex
+    removes the virtualenv named ephemeral.
+
+
 If you break things by doing weird fun things with vex, you get to keep all the
 pieces left over.
 
@@ -236,6 +242,23 @@ You can also set which directory the subprocess starts in,
 like this shell which starts in ``/tmp``::
 
     vex --cwd /tmp foo bash
+
+You can also have vex create the named virtualenv before running the command::
+
+    vex --make foo bash
+
+Or you can have vex remove the already-existing virtualenv after running the
+command::
+
+    vex --remove foo bash
+
+Or you can create a previously nonexistent virtualenv, run the command
+in it, then remove it once the command exits::
+
+    vex --make --remove foo bash
+
+This can also be abbreviated as 'vex -mr foo bash'.
+
 
 
 Config
