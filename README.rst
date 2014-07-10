@@ -426,21 +426,6 @@ This could be put in, e.g., ``~/.config/fish/config.fish``.
 
     . (vex --shell-config fish|psub)
 
-pydoc
-=====
-
-Unfortunately pydoc doesn't work right now, because virtualenv decided to
-support it with a shell function. A workaround is to define a shell
-alias, e.g. for bash:
-
-.. code-block:: bash
-
-    alias pydoc='python -m pydoc'
-
-
-This uses whatever the current 'python' is, so it does the right thing based on
-whatever virtualenv you are in. A better solution may be pending.
-
 
 Caveats
 =======
