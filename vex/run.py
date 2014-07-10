@@ -27,12 +27,6 @@ def get_environ(environ, defaults, ve_path):
     else:
         ve_bin = os.path.join(ve_path, 'bin')
 
-    # I don't expect this to fail, but I'd rather be slightly paranoid
-    # and fail early before putting a nonexistent path on PATH.
-    # this error message sucks and should never be reached.
-    if not os.path.exists(ve_bin):
-        raise exceptions.BadConfig('ve_bin %r does not exist' % ve_bin)
-
     # If user is currently in a virtualenv, DON'T just prepend
     # to its path (vex foo; echo $PATH -> " /foo/bin:/bar/bin")
     # but don't incur this cost unless we're already in one.

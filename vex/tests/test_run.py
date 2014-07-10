@@ -71,21 +71,6 @@ class TestGetEnviron(object):
         with raises(exceptions.BadConfig):
             run.get_environ({}, {}, '')
 
-    def test_ve_bin_path_does_not_exist(self):
-
-        yay = 'yay'
-        yay_bin = os.path.join(yay, 'bin')
-
-        def fake_exists(path):
-            if path in (yay, yay_bin):
-                return True
-            return False
-
-        with patch('os.path.exists', wraps=fake_exists):
-            with raises(exceptions.BadConfig):
-                run.get_environ({}, {}, 'yak')
-            run.get_environ({}, {}, 'yay')
-
     def test_copies_original(self):
         original = {'foo': 'bar'}
         defaults = {}
