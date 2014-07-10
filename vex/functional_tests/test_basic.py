@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 import os
+import re
 import sys
-import time
 import logging
 from threading import Timer
 from subprocess import Popen, PIPE
@@ -347,7 +347,7 @@ class TestWithVirtualenv(object):
             assert run.returned == 1
 
 
-class TestMake(object):
+class TestMakeAndRemove(object):
     def test_make(self):
         parent = TempDir()
         venv_name = b'make_test'
@@ -365,8 +365,6 @@ class TestMake(object):
             assert os.path.exists(venv_path)
         parent.close()
 
-
-class TestRemove(object):
     def test_remove(self):
         parent = TempDir()
         venv = TempVenv(parent.path, 'vex_tests', [])
@@ -384,4 +382,28 @@ class TestRemove(object):
             assert not os.path.exists(venv.path)
             assert os.path.exists(parent.path)
         venv.close()
+        parent.close()
+
+    def test_make_and_remove(self):
+        parent = TempDir()
+        env = {'WORKON_HOME': parent.path.decode('utf-8')}
+        venv_name = b"make_and_remove"
+        venv_path = os.path.join(parent.path, venv_name)
+        assert os.path.exists(parent.path)
+        assert not os.path.exists(venv_path)
+        with Run(['--make', '--remove', venv_name,
+                  'python', '-c',
+                  'import os; print(os.environ.get("VIRTUAL_ENV"))'
+                  ], env=env) as run:
+            run.finish()
+            assert run.out
+            lines = [line.strip() for line in run.out.strip().split(b'\n')]
+            assert b'make_and_remove' in lines[-2], lines
+            assert b'remove' in lines[-1].lower(), lines
+            assert b'make_and_remove' in lines[-1], lines
+            assert run.command_found
+            assert run.returned == 0
+            assert not run.err
+            assert not os.path.exists(venv_path)
+            assert os.path.exists(parent.path)
         parent.close()
