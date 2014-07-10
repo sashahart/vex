@@ -65,6 +65,24 @@ class BadConfig(InvalidArgument):
     pass
 
 
+class VirtualenvAlreadyMade(InvalidArgument):
+    """could not make virtualenv as one already existed.
+    """
+    pass
+
+
+class VirtualenvNotMade(InvalidArgument):
+    """could not make virtualenv.
+    """
+    pass
+
+
+class VirtualenvNotRemoved(InvalidArgument):
+    """raised when virtualenv could not be removed.
+    """
+    pass
+
+
 if sys.version_info > (3, 3):
     CommandNotFoundError = FileNotFoundError
 else:

@@ -9,6 +9,37 @@ def make_arg_parser():
         formatter_class=argparse.RawTextHelpFormatter,
         usage="vex [OPTIONS] VIRTUALENV_NAME COMMAND_TO_RUN ...",
     )
+
+    make = parser.add_argument_group(title='To make a new virtualenv')
+    make.add_argument(
+        '-m', '--make',
+        action="store_true",
+        help="make named virtualenv before running command"
+    )
+    make.add_argument(
+        '--python',
+        help="specify which python for virtualenv to be made",
+        action="store",
+        default="python",
+    )
+    make.add_argument(
+        '--site-packages',
+        help="allow site package imports from new virtualenv",
+        action="store_true",
+    )
+    make.add_argument(
+        '--always-copy',
+        help="use copies instead of symlinks in new virtualenv",
+        action="store_true",
+    )
+
+    remove = parser.add_argument_group(title='To remove a virtualenv')
+    remove.add_argument(
+        '-r', '--remove',
+        action="store_true",
+        help="remove the named virtualenv after running command"
+    )
+
     parser.add_argument(
         "--path",
         metavar="DIR",
