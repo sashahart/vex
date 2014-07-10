@@ -4,6 +4,17 @@ from vex.run import run
 from vex import exceptions
 
 
+PYDOC_SCRIPT = """#!/usr/bin/env python
+from pydoc import cli
+cli()
+""".encode('ascii')
+
+
+PYDOC_BATCH = """
+@python -m pydoc %*
+""".encode('ascii')
+
+
 def handle_make(environ, options, make_path):
     if os.path.exists(make_path):
         # Can't ignore existing virtualenv happily because existing one
@@ -40,3 +51,13 @@ def handle_make(environ, options, make_path):
     returncode = run(args, env=environ, cwd=ve_base)
     if returncode != 0:
         raise exceptions.VirtualenvNotMade("error creating virtualenv")
+    if os.name != 'nt':
+        pydoc_path = os.path.join(make_path, 'bin', 'pydoc')
+        with open(pydoc_path, 'wb') as out:
+            out.write(PYDOC_SCRIPT)
+        perms = os.stat(pydoc_path).st_mode
+        os.chmod(pydoc_path, perms | 0o0111)
+    else:
+        pydoc_path = os.path.join(make_path, 'Scripts', 'pydoc.bat')
+        with open(pydoc_path, 'wb') as out:
+            out.write(PYDOC_BATCH)
