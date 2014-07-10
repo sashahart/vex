@@ -346,6 +346,20 @@ class TestWithVirtualenv(object):
             assert not run.err.startswith(b'Traceback')
             assert run.returned == 1
 
+    def test_pydoc(self):
+        env = {'WORKON_HOME': self.parent.path.decode('utf-8')}
+        assert os.path.exists(self.venv.path)
+        with Run([self.venv.name, 'pydoc', 'pip'], env=env) as run:
+            run.finish(b'q')
+            assert run.command_found
+            assert run.returned == 0
+            assert not run.err
+            start = run.out.find(b'FILE')
+            chunk = run.out[start:].strip()
+            lines = chunk.split(b'\n')
+            assert lines[0] == b'FILE'
+            assert self.venv.path in lines[1]
+
 
 class TestMakeAndRemove(object):
     def test_make(self):
