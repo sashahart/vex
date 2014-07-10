@@ -1,6 +1,5 @@
 from __future__ import unicode_literals
 import os
-import re
 import sys
 import logging
 from threading import Timer
@@ -346,19 +345,6 @@ class TestWithVirtualenv(object):
             assert not run.err.startswith(b'Traceback')
             assert run.returned == 1
 
-    def test_pydoc(self):
-        env = {'WORKON_HOME': self.parent.path.decode('utf-8')}
-        assert os.path.exists(self.venv.path)
-        with Run([self.venv.name, 'pydoc', 'pip'], env=env) as run:
-            run.finish(b'q')
-            assert run.command_found
-            assert run.returned == 0
-            assert not run.err
-            start = run.out.find(b'FILE')
-            chunk = run.out[start:].strip()
-            lines = chunk.split(b'\n')
-            assert lines[0] == b'FILE'
-            assert self.venv.path in lines[1]
 
 
 class TestMakeAndRemove(object):
@@ -421,3 +407,24 @@ class TestMakeAndRemove(object):
             assert not os.path.exists(venv_path)
             assert os.path.exists(parent.path)
         parent.close()
+
+    def test_pydoc(self):
+        parent = TempDir()
+        env = {'WORKON_HOME': parent.path.decode('utf-8')}
+        venv_name = b'test_pydoc'
+        venv_path = os.path.join(parent.path, venv_name)
+        assert not os.path.exists(venv_path)
+        with Run(['--make', '--remove', venv_name,
+                  'pydoc', 'pip'], env=env) as run:
+            run.finish(b'q')
+            assert run.command_found
+            assert run.returned == 0
+            assert not run.err
+            assert b"no Python documentation found for 'pip'" not in run.out
+            start = run.out.find(b'FILE')
+            assert start > -1
+            chunk = run.out[start:].strip()
+            lines = chunk.split(b'\n')
+            assert lines
+            assert lines[0] == b'FILE'
+            assert venv_path in lines[1]
