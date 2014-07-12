@@ -10,8 +10,6 @@ It works in a more elegant way, though it does less.
 You might find it nicer to use.
 And it works with non-bash shells.
 
-(Convenience switches to make and remove virtualenvs
-are coming soon.)
 
 How it works
 ============
