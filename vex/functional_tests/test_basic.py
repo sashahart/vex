@@ -119,6 +119,16 @@ def test_help():
 
 class TestShellConfig(object):
 
+    def test_no_ve_base(self):
+        """vex --shell-config bash with e.g. no ~/.virtualenvs
+        """
+        env = {'WORKON_HOME': '/totally/nonexistent'}
+        assert not os.path.exists(env['WORKON_HOME'])
+        with Run(['--shell-config', 'bash'], env=env, timeout=0.5) as run:
+            run.finish()
+            assert run.out
+            assert not run.err
+
     def test_no_arg(self):
         """vex --shell-config
 
