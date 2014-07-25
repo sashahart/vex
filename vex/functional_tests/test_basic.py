@@ -145,7 +145,8 @@ class TestShellConfig(object):
 
         Emits something and doesn't crash
         """
-        with Run(['--shell-config', 'bash'], timeout=0.5) as run:
+        env = {'WORKON_HOME': os.getcwd()}
+        with Run(['--shell-config', 'bash'], env=env, timeout=0.5) as run:
             run.finish()
             assert run.out
             assert not run.err
@@ -155,7 +156,8 @@ class TestShellConfig(object):
 
         Emits something and doesn't crash
         """
-        with Run(['--shell-config', 'zsh'], timeout=0.5) as run:
+        env = {'WORKON_HOME': os.getcwd()}
+        with Run(['--shell-config', 'zsh'], env=env, timeout=0.5) as run:
             run.finish()
             assert run.out
             assert not run.err
@@ -165,7 +167,8 @@ class TestShellConfig(object):
 
         Emits something and doesn't crash
         """
-        with Run(['--shell-config', 'fish'], timeout=0.5) as run:
+        env = {'WORKON_HOME': os.getcwd()}
+        with Run(['--shell-config', 'fish'], env=env, timeout=0.5) as run:
             run.finish()
             assert run.out
             assert not run.err
