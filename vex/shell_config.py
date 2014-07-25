@@ -44,8 +44,7 @@ def shell_config_for(shell, vexrc, environ):
             raise
         return b''
     ve_base = vexrc.get_ve_base(environ).encode('ascii')
-    if ve_base and not scary_path(ve_base):
-        assert os.path.exists(ve_base)
+    if ve_base and not scary_path(ve_base) and os.path.exists(ve_base):
         data = data.replace(b'$WORKON_HOME', ve_base)
     return data
 
