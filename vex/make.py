@@ -19,7 +19,9 @@ def handle_make(environ, options, make_path):
     if os.path.exists(make_path):
         # Can't ignore existing virtualenv happily because existing one
         # might have different parameters and --make implies nonexistent
-        raise exceptions.VirtualenvAlreadyMade(make_path)
+        raise exceptions.VirtualenvAlreadyMade(
+            "virtualenv already exists: {0!r}".format(make_path)
+        )
     ve_base = os.path.dirname(make_path)
     if not os.path.exists(ve_base):
         os.mkdir(ve_base)
