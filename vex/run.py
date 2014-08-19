@@ -58,7 +58,8 @@ def run(command, env, cwd):
     if cwd:
         assert os.path.exists(cwd)
     try:
-        process = subprocess.Popen(command, env=env, cwd=cwd)
+        shell = os.name == 'nt'
+        process = subprocess.Popen(command, env=env, cwd=cwd, shell=shell)
         process.wait()
     except exceptions.CommandNotFoundError as error:
         if error.errno != 2:
