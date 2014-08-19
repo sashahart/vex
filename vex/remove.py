@@ -7,7 +7,7 @@ def obviously_not_a_virtualenv(path):
     include = os.path.join(path, 'include')
     bin = os.path.join(path, 'bin')
     scripts = os.path.join(path, 'Scripts')
-    if not os.path.exists(bin) or os.path.exists(scripts):
+    if not (os.path.exists(bin) or os.path.exists(scripts)):
         return True
     if not os.path.exists(include):
         return True
