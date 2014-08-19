@@ -20,7 +20,7 @@ def make_arg_parser():
         '--python',
         help="specify which python for virtualenv to be made",
         action="store",
-        default="python",
+        default=None,
     )
     make.add_argument(
         '--site-packages',
