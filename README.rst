@@ -179,49 +179,6 @@ This will allow Windows to know what you mean when you type 'vex' (or the name
 of any Python command-line tool which supports Windows and which you have
 wisely installed with ``pip install --user``).
 
-The .virtualenvs directory
---------------------------
-
-vex users who used virtualenvwrapper should find that vex works well with
-their current setup, usually with no changes.
-
-The first argument to 'vex' (i.e., the 'foo' in 'vex foo') is not the path to
-a virtualenv. It's the name of a virtualenv, which is to be found in
-a directory you keep virtualenvs (the location is configurable).
-
-If you never used virtualenv or virtualenvwrapper before, you might want to
-create a directory called .virtualenvs (that starts with a dot) in your home
-directory, e.g.::
-
-    mkdir /home/sam/.virtualenvs
-
-or on Windows::
-
-    mkdir c:\users\sam\.virtualenvs
-
-These are just examples! Your paths might be different. As a developer you
-should learn about how to find your home directory.
-
-Once this is done, you can use the original virtualenv tool to make new
-virtualenvs there, e.g. to make a virtualenv named 'foo'::
-
-    virtualenv /home/sam/.virtualenvs/foo
-
-or on Windows::
-
-    mkdir c:\users\sam\.virtualenvs\foo
-
-(if there is demand I'll implement a switch in vex to automate this slightly
-more.)
-
-Once you have a virtualenv made under .virtualenvs,
-you can use vex to run whatever inside that virtualenv - for example,
-start a python shell using::
-
-    vex foo python
-
-
-
 Options
 =======
 
