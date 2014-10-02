@@ -3,6 +3,7 @@
 import os
 import platform
 import subprocess
+import distutils.spawn
 from vex import exceptions
 
 
@@ -69,6 +70,10 @@ def run(command, env, cwd):
     assert command
     if cwd:
         assert os.path.exists(cwd)
+    if platform.system() == "Windows":
+        exe = distutils.spawn.find_executable(command[0], path=env['PATH'])
+        if exe:
+            command[0] = exe
     try:
         process = subprocess.Popen(command, env=env, cwd=cwd)
         process.wait()
