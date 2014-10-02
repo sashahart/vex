@@ -1,5 +1,6 @@
 import os
 import sys
+import distutils.spawn
 from vex.run import run
 from vex import exceptions
 
@@ -45,6 +46,10 @@ def handle_make(environ, options, make_path):
         ve = 'virtualenv'
     args = [ve, make_path]
     if options.python:
+        if os.name == 'nt':
+            python = distutils.spawn.find_executable(options.python)
+            if python:
+                options.python = python
         args += ['--python', options.python]
     if options.site_packages:
         args += ['--system-site-packages']
