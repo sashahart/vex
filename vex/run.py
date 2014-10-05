@@ -74,6 +74,10 @@ def run(command, env, cwd):
         exe = distutils.spawn.find_executable(command[0], path=env['PATH'])
         if exe:
             command[0] = exe
+    _, command_name = os.path.split(command[0])
+    if (command_name in ('bash', 'zsh')
+    and 'VIRTUALENVWRAPPER_PYTHON' not in env):
+        env['VIRTUALENVWRAPPER_PYTHON'] = ':'
     try:
         process = subprocess.Popen(command, env=env, cwd=cwd)
         process.wait()
