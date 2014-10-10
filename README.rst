@@ -179,6 +179,62 @@ This will allow Windows to know what you mean when you type 'vex' (or the name
 of any Python command-line tool which supports Windows and which you have
 wisely installed with ``pip install --user``).
 
+Another PATH problem
+--------------------
+
+Unless you already know better, if you need to adjust PATH for the benefit
+of your shell or installing some utility, you probably want to do that
+with changes in ~/.profile or equivalent (e.g. ~/.bash_profile, ~/.zprofile),
+which will take effect the next time you start a login shell.
+Otherwise, you might break a whole class of things that includes vex,
+in a way that cannot be reasonably automatically corrected. 
+
+If you understood that, then you don't have to read the rest of this section
+which is just for explanation. Here's the longer story:
+
+Apparently some command-line tools have recommended in their docs that you
+stick things on the front of $PATH from ~/.bashrc (equivalently .zshrc, etc.)
+But this can cause problems for other utilities and scripts, if you do not
+understand the meaning of doing it this way instead of another way.
+The meaning of making these changes in files like ~/.bashrc instead of
+other files is this: "I want this directory to be searched for executables
+before ANY other directory, EVERY time. This is VERY important to me. It's 
+my favorite directory to find executables in."
+
+This might not normally be a problem for you. 
+But it means that any other script or utility which puts another directory at
+the front of PATH is going to be overruled. For example, vex helpfully puts the
+bin/ directory of the relevant virtualenv at the head of PATH. It's the only
+reasonable way to achieve this effect. But if your ~/.bashrc says "SMASH PATH"
+then when you run bash under vex, vex will hand off a perfectly good
+virtualenv-activated environment for bash to use, and then after vex hands off
+bash will smash PATH as you instructed, and something else will have priority
+before your virtualenv stuff. 
+
+There's nothing bash or vex can do about this because, first, it's impossible
+to determine whether this was a mistake or something you literally intended,
+and not okay to squash the people who might literally intend this; and second,
+the only way that vex could override what you told bash to do would be for me
+to give you more shell-specific crap for you to source in ~/.bashrc that
+mutates the current environment, which is exactly what vex is getting away
+from. There is literally no way for vex to stop processes from messing up their
+own environments, the best it can do is hand off the right thing.
+
+So instead of telling bash to do something that breaks vex, then wanting vex to
+do something which breaks everything else to override what you told bash to do,
+just don't make this change in ~/.bashrc unless you WANT other things to take
+precedence over your virtualenvs whenever you start bash. 
+
+A good solution is to use ~/.profile (or similar files your shell uses like
+~/.bash_profile, ~/.zprofile) to make changes in PATH. Because this only runs
+at the creation of a login shell, e.g. when you log in to X, it is possible
+for vex and other utilities to make the right adjustment without something
+in ~/.bashrc squishing it immediately afterward. And when the subprocess goes
+away, there is no environmental residue, and vex doesn't have to couple to
+specific shells or depend on shell at all, and you don't have to put any more
+crap in ~/.bashrc unless it's specifically what you mean to have there.
+
+
 Options
 =======
 
