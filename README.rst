@@ -234,6 +234,21 @@ away, there is no environmental residue, and vex doesn't have to couple to
 specific shells or depend on shell at all, and you don't have to put any more
 crap in ~/.bashrc unless it's specifically what you mean to have there.
 
+A detail pertaining to shell environment variables like WORKON_HOME
+-------------------------------------------------------------------
+
+In shell, putting a tilde in quotes like '~' or "~" means you want
+to suppress expansion of that into the path of your home directory.
+Therefore, if you set WORKON_HOME to some quoted value, it won't be
+expanded, and vex will have no way to know whether you mean a path
+with a tilde in it, but will have to assume that you do.
+
+So when you set a variable like WORKON_HOME, use one of these styles:
+
+    export WORKON_HOME=~/.virtualenvs
+    export WORKON_HOME=$HOME/.virtualenvs
+    export WORKON_HOME="$HOME/.virtualenvs"
+
 
 Options
 =======
