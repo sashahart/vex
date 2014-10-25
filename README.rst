@@ -243,7 +243,7 @@ Therefore, if you set WORKON_HOME to some quoted value, it won't be
 expanded, and vex will have no way to know whether you mean a path
 with a tilde in it, but will have to assume that you do.
 
-So when you set a variable like WORKON_HOME, use one of these styles:
+So when you set a variable like WORKON_HOME, use one of these styles::
 
     export WORKON_HOME=~/.virtualenvs
     export WORKON_HOME=$HOME/.virtualenvs
