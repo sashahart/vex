@@ -138,6 +138,9 @@ def _main(environ, argv):
         ve_path = make_path
     elif options.path:
         ve_path = os.path.abspath(options.path)
+        if not os.path.exists(ve_path) or not os.path.isdir(ve_path):
+            raise exceptions.InvalidVirtualenv(
+                "argument for --path is not a directory")
     else:
         try:
             ve_path = get_virtualenv_path(ve_base, ve_name)
