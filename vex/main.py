@@ -22,6 +22,8 @@ def get_vexrc(options, environ):
     if options.config and not os.path.exists(options.config):
         raise exceptions.InvalidVexrc("nonexistent config: {0!r}".format(options.config))
     filename = options.config or os.path.expanduser('~/.vexrc')
+    if options.verbose and os.path.exists(filename):
+        print('[*] Using config {0}'.format(filename))
     vexrc = config.Vexrc.from_file(filename, environ)
     return vexrc
 
@@ -123,6 +125,11 @@ def _main(environ, argv):
     ve_base = vexrc.get_ve_base(environ)
     ve_name = get_virtualenv_name(options)
     command = get_command(options, vexrc, environ)
+    if options.verbose:
+        print('[*] Dir with virtualenvs: {0}'.format(ve_base))
+        print('[*] Name of virtualenv: {0}'.format(ve_name))
+        print('[*] Command to run: {0}'.format(command))
+
     # Either we create ve_path, get it from options.path or find it
     # in ve_base.
     if options.make:

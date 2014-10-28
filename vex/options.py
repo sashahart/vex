@@ -41,6 +41,11 @@ def make_arg_parser():
     )
 
     parser.add_argument(
+        '-v', '--verbose',
+        help='show verbose output for debug',
+        action='store_true'
+    )
+    parser.add_argument(
         "--path",
         metavar="DIR",
         help="absolute path to virtualenv to use",
