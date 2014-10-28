@@ -48,7 +48,7 @@ def make_arg_parser():
     parser.add_argument(
         "--path",
         metavar="DIR",
-        help="absolute path to virtualenv to use",
+        help="custom path to virtualenv to use",
         action="store"
     )
     parser.add_argument(
