@@ -130,17 +130,15 @@ def _main(environ, argv):
         print('[*] Name of virtualenv: {0}'.format(ve_name))
         print('[*] Command to run: {0}'.format(command))
 
-    # Either we create ve_path, get it from options.path or find it
-    # in ve_base.
-    if options.make:
-        if options.path:
-            make_path = os.path.abspath(options.path)
-        else:
-            make_path = os.path.abspath(os.path.join(ve_base, ve_name))
-        handle_make(environ, options, make_path)
-        ve_path = make_path
-    elif options.path:
+    if options.path:
         ve_path = os.path.abspath(options.path)
+    else:
+        ve_path = os.path.abspath(os.path.join(ve_base, ve_name))
+    if options.verbose:
+        print('[*] Using path: {0}'.format(ve_path))
+
+    if options.make:
+        handle_make(environ, options, ve_path)
     else:
         try:
             ve_path = get_virtualenv_path(ve_base, ve_name)
