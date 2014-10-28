@@ -69,6 +69,11 @@ def make_arg_parser():
         help="print optional config for the specified shell"
     )
     parser.add_argument(
+        '--version',
+        help="print the version of vex that is being run",
+        action="store_true"
+    )
+    parser.add_argument(
         "rest",
         nargs=argparse.REMAINDER,
         help=argparse.SUPPRESS)

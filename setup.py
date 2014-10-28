@@ -1,17 +1,25 @@
+import os
 from setuptools import setup
 
+
 with open('README.rst', 'r') as inp:
-    long_description = inp.read()
+    LONG_DESCRIPTION = inp.read()
+
+
+with open(os.path.join('vex', '_version.py'), 'r') as inp:
+    _, VERSION = inp.read().split("=")
+    VERSION = VERSION.strip(' "\n')
+
 
 setup(
     name="vex",
-    version="0.0.15",
+    version=VERSION,
     author="Sasha Hart",
     author_email="s@sashahart.net",
     url="http://github.com/sashahart/vex",
     description="Run commands in a virtualenv",
     license="MIT",
-    long_description=long_description,
+    long_description=LONG_DESCRIPTION,
     keywords="virtualenv virtualenvwrapper workon installation deployment",
     install_requires=['virtualenv'],
     packages=['vex'],

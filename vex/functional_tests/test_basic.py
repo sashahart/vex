@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 import os
 import sys
+import re
 import logging
 from threading import Timer
 from subprocess import Popen, PIPE
@@ -115,6 +116,18 @@ def test_help():
         assert run.out.startswith(b'usage'), "unexpected output on stdout"
         assert b'--help' in run.out, "unexpected output on stdout"
         assert not run.err, "unexpected presence of output on stderr"
+
+
+def test_version():
+    """vex --version
+
+    Emits a string of numbers and periods, one newline
+    """
+    with Run(['--version'], timeout=0.5) as run:
+        run.finish()
+        assert run.out is not None
+        match = re.match(b'^\d+\.\d+\.\d+\n$', run.out)
+        assert match
 
 
 class TestShellConfig(object):

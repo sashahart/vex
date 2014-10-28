@@ -9,6 +9,7 @@ from vex.shell_config import handle_shell_config
 from vex.make import handle_make
 from vex.remove import handle_remove
 from vex import exceptions
+from vex._version import VERSION
 
 
 def get_vexrc(options, environ):
@@ -112,6 +113,9 @@ def _main(environ, argv):
     should be delivered on stderr, to be caught by main.
     """
     options = get_options(argv)
+    if options.version:
+        sys.stdout.write(VERSION + "\n")
+        return 0
     vexrc = get_vexrc(options, environ)
     # Handle --shell-config as soon as its arguments are available.
     if options.shell_to_configure:
