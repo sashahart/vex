@@ -150,7 +150,7 @@ def _main(environ, argv):
     # get_environ has to wait until ve_path is defined, which might
     # be after a make; of course we can't run until we have env.
     env = get_environ(environ, vexrc['env'], ve_path)
-    returncode = run(command, env=env, cwd=cwd)
+    returncode = run(command, env=env, cwd=cwd, handle_sigint=True)
     if options.remove:
         handle_remove(ve_path)
     if returncode is None:

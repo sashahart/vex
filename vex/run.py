@@ -4,6 +4,7 @@ import os
 import platform
 import subprocess
 import distutils.spawn
+import signal
 from vex import exceptions
 
 
@@ -64,7 +65,7 @@ def get_environ(environ, defaults, ve_path):
     return env
 
 
-def run(command, env, cwd):
+def run(command, env, cwd, handle_sigint=False):
     """Run the given command.
     """
     assert command
@@ -80,7 +81,12 @@ def run(command, env, cwd):
         env['VIRTUALENVWRAPPER_PYTHON'] = ':'
     try:
         process = subprocess.Popen(command, env=env, cwd=cwd)
+
+        if handle_sigint:
+            signal.signal(signal.SIGINT, signal.SIG_IGN)
         process.wait()
+        if handle_sigint:
+            signal.signal(signal.SIGINT, signal.SIG_DFL)
     except exceptions.CommandNotFoundError as error:
         if error.errno != 2:
             raise
