@@ -130,6 +130,21 @@ def test_version():
         assert match
 
 
+def test_list():
+    """vex --list
+
+    Emits a list of directories in ve_base separated by newline
+    """
+    ve_base = TempDir()
+    os.mkdir(os.path.join(ve_base.path, b"foo"))
+    os.mkdir(os.path.join(ve_base.path, b"bar"))
+    env = {'WORKON_HOME': ve_base.path}
+    with ve_base, Run(['--list'], env=env, timeout=0.5) as run:
+        run.finish()
+        assert run.out is not None
+        assert run.out == b'bar\nfoo\n'
+
+
 class TestShellConfig(object):
 
     def test_no_ve_base(self):

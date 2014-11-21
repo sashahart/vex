@@ -111,6 +111,18 @@ def handle_version():
     return 0
 
 
+def handle_list(ve_base, prefix=""):
+    text = "\n".join(
+        sorted(
+            relative_path for relative_path in os.listdir(ve_base)
+            if relative_path.startswith(prefix)
+            and os.path.isdir(os.path.join(ve_base, relative_path))
+        )
+    )
+    sys.stdout.write(text + "\n")
+    return 0
+
+
 def _main(environ, argv):
     """Logic for main(), with less direct system interaction.
 
@@ -124,6 +136,9 @@ def _main(environ, argv):
     # Handle --shell-config as soon as its arguments are available.
     if options.shell_to_configure:
         return handle_shell_config(options.shell_to_configure, vexrc, environ)
+    if options.list is not None:
+        return handle_list(vexrc.get_ve_base(environ), options.list)
+
     # Do as much as possible before a possible make, so errors can raise
     # without leaving behind an unused virtualenv.
     # get_virtualenv_name is destructive and must happen before get_command
