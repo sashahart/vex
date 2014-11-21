@@ -106,6 +106,11 @@ def get_command(options, vexrc, environ):
     return command
 
 
+def handle_version():
+    sys.stdout.write(VERSION + "\n")
+    return 0
+
+
 def _main(environ, argv):
     """Logic for main(), with less direct system interaction.
 
@@ -114,8 +119,7 @@ def _main(environ, argv):
     """
     options = get_options(argv)
     if options.version:
-        sys.stdout.write(VERSION + "\n")
-        return 0
+        return handle_version()
     vexrc = get_vexrc(options, environ)
     # Handle --shell-config as soon as its arguments are available.
     if options.shell_to_configure:
