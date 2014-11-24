@@ -9,9 +9,9 @@ def obviously_not_a_virtualenv(path):
     scripts = os.path.join(path, 'Scripts')
     if not os.path.exists(bin) and not os.path.exists(scripts):
         return True
-    if not os.path.exists(include):
-        return True
-    if not any(filename.startswith('py') for filename in os.listdir(include)):
+    if os.path.exists(include) and not any(
+            filename.startswith('py') for filename in os.listdir(include)
+    ):
         return True
     return False
 
