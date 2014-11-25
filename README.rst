@@ -283,8 +283,24 @@ in it, then remove it once the command exits::
 
     vex --make --remove foo bash
 
-This can also be abbreviated as 'vex -mr foo bash'.
+This can also be abbreviated as ``'vex -mr foo bash'``.
 
+For the benefit of people who do not use the shell completions,
+you can also list available virtualenvs::
+
+    vex --list
+
+This should list the virtualenvs you have in the directory
+specified by 'virtualenvs=' in .vexrc or by setting $WORKON_HOME. 
+``--list`` does not combine with any other options.
+
+Since you might have many virtualenvs or you might be looking
+for something specific (or building your own completion),
+you can also list virtualenvs beginning with a certain prefix::
+
+    vex --list a
+
+If you need more detailed filtering, pipe to grep or something.
 
 
 Config
