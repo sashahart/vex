@@ -69,6 +69,15 @@ def make_arg_parser():
         help="print optional config for the specified shell"
     )
     parser.add_argument(
+        '--list',
+        metavar="PREFIX",
+        nargs="?",
+        const="",
+        default=None,
+        help="print a list of available virtualenvs [matching PREFIX]",
+        action="store"
+    )
+    parser.add_argument(
         '--version',
         help="print the version of vex that is being run",
         action="store_true"
