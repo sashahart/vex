@@ -138,6 +138,7 @@ def test_list():
     ve_base = TempDir()
     os.mkdir(os.path.join(ve_base.path, b"foo"))
     os.mkdir(os.path.join(ve_base.path, b"bar"))
+    os.mkdir(os.path.join(ve_base.path, b"-nope"))
     env = {'WORKON_HOME': ve_base.path}
     with ve_base, Run(['--list'], env=env, timeout=0.5) as run:
         run.finish()

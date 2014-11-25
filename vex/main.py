@@ -115,7 +115,8 @@ def handle_list(ve_base, prefix=""):
     text = "\n".join(
         sorted(
             relative_path for relative_path in os.listdir(ve_base)
-            if relative_path.startswith(prefix)
+            if not relative_path.startswith("-")
+            and relative_path.startswith(prefix)
             and os.path.isdir(os.path.join(ve_base, relative_path))
         )
     )
