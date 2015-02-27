@@ -112,10 +112,13 @@ def handle_version():
 
 
 def handle_list(ve_base, prefix=""):
+    if not os.path.isdir(ve_base):
+        sys.stderr.write("no virtualenvs directory at {0!r}\n".format(ve_base))
+        return 1
     text = "\n".join(
         sorted(
             relative_path for relative_path in os.listdir(ve_base)
-            if not relative_path.startswith("-")
+            if (not relative_path.startswith("-"))
             and relative_path.startswith(prefix)
             and os.path.isdir(os.path.join(ve_base, relative_path))
         )
