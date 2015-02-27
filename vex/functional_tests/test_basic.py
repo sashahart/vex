@@ -146,6 +146,18 @@ def test_list():
         assert run.out == b'bar\nfoo\n'
 
 
+def test_list_no_ve_base():
+    nonexistent = os.path.join('/tmp/whatever/foo/bar')
+    assert not os.path.exists(nonexistent)
+    env = {'WORKON_HOME': nonexistent}
+    with Run(['--list'], env=env, timeout=0.5) as run:
+        run.finish()
+        assert run.returned == 1
+        assert not run.out
+        assert run.err
+        assert nonexistent.encode("ascii") in run.err
+
+
 class TestShellConfig(object):
 
     def test_no_ve_base(self):
