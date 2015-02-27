@@ -142,7 +142,7 @@ def test_list():
     env = {'WORKON_HOME': ve_base.path}
     with ve_base, Run(['--list'], env=env, timeout=0.5) as run:
         run.finish()
-        assert run.out is not None
+        assert not run.err
         assert run.out == b'bar\nfoo\n'
 
 
