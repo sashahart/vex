@@ -446,6 +446,8 @@ This could be put in, e.g., ``~/.bashrc``.
 
    eval "$(vex --shell-config bash)"
 
+OS X users may need to enable bash completion before this will work.
+
 zsh
 ---
 
