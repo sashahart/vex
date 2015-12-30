@@ -55,6 +55,8 @@ def handle_make(environ, options, make_path):
         args += ['--system-site-packages']
     if options.always_copy:
         args+= ['--always-copy']
+    if options.no_wheel:
+        args+= ['--no-wheel']
     returncode = run(args, env=environ, cwd=ve_base)
     if returncode != 0:
         raise exceptions.VirtualenvNotMade("error creating virtualenv")

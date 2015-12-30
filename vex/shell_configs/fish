@@ -75,6 +75,7 @@ complete -c vex -l make -n "__fish_no_arguments" -d "create named virtualenv bef
 complete -c vex -l python -n "__fish_contains_opt make" -a PYTHON -d "specify python to use with --make"
 complete -c vex -l site-packages -n "__fish_contains_opt make" -d "allow import of site packages from new virtualenv"
 complete -c vex -l always-copy -n "__fish_contains_opt make" -d "copy files instead of creating symlinks when making virtualenv"
+complete -c vex -l no-wheel -n "__fish_contains_opt make" -d "do not install wheel in the new virtualenv"
 complete -c vex -l remove -s r -n "__fish_no_arguments" -d "remove named virtualenv after running"
 
 # any switches on the end - no clear way to stop the processing!

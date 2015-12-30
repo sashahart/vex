@@ -14,6 +14,7 @@ _vex() {
             '--python[use the named python when making virtualenv]:python:(${pythons})' \
             '--site-packages[made virtualenv allows access to site packages]' \
             '--always-copy[copy files instead of making symlinks]' \
+            '--no-wheel[do not install wheel in the new virtualenv]' \
         '(-r --remove)'{-r,--remove}'[remove the named virtualenv after running command]' \
         '(1)--path[set path to virtualenv]:virtualenv directory:_path_files -/' \
         '(--path)1:virtualenv:_path_files -/ -W "$WORKON_HOME"' \

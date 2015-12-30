@@ -32,6 +32,11 @@ def make_arg_parser():
         help="use copies instead of symlinks in new virtualenv",
         action="store_true",
     )
+    make.add_argument(
+        '--no-wheel',
+        help="do not install wheel in the new virtualenv",
+        action="store_true",
+    )
 
     remove = parser.add_argument_group(title='To remove a virtualenv')
     remove.add_argument(
