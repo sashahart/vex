@@ -117,6 +117,12 @@ class Vexrc(object):
         return command
 
 
+    def get_default_python(self, environ):
+        """Find a command to run.
+        """
+        runtime = self.headings[self.default_heading].get('python')
+        return runtime if runtime else None
+
 def extract_heading(line):
     """Return heading in given line or None if it's not a heading.
     """

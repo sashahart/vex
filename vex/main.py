@@ -157,6 +157,8 @@ def _main(environ, argv):
             make_path = os.path.abspath(options.path)
         else:
             make_path = os.path.abspath(os.path.join(ve_base, ve_name))
+        if options.python is None:
+            options.python = vexrc.get_default_python(environ)
         handle_make(environ, options, make_path)
         ve_path = make_path
     elif options.path:
