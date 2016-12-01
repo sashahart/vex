@@ -38,13 +38,23 @@ def get_environ(environ, defaults, ve_path):
     # virtualenv doesn't...
     current_ve = env.get('VIRTUAL_ENV', '')
     system_path = environ.get('PATH', '')
-    segments = system_path.split(os.pathsep)
+
+    # On Windows the separators can get squirrelly (a mix of / and \\)
+    # Just enforce that they're all normalized before we match on them
+    segments = map(os.path.normpath, system_path.split(os.pathsep))
+
     if current_ve:
         # Since activate doesn't export _OLD_VIRTUAL_PATH, we are going to
         # manually remove the virtualenv's bin.
         # A virtualenv's bin should not normally be on PATH except
         # via activate or similar, so I'm OK with this solution.
-        current_ve_bin = os.path.join(current_ve, 'bin')
+        if platform.system() == 'Windows':
+            current_ve_bin = os.path.join(os.path.normpath(current_ve),
+					  'Scripts')
+        else:
+            current_ve_bin = os.path.join(os.path.normpath(current_ve),
+					  'bin')
+
         try:
             segments.remove(current_ve_bin)
         except ValueError:
