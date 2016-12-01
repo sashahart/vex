@@ -79,7 +79,8 @@ def run(command, env, cwd):
     and 'VIRTUALENVWRAPPER_PYTHON' not in env):
         env['VIRTUALENVWRAPPER_PYTHON'] = ':'
     try:
-        process = subprocess.Popen(command, env=env, cwd=cwd)
+        shell = os.name == 'nt'
+        process = subprocess.Popen(command, env=env, cwd=cwd, shell=shell)
         process.wait()
     except exceptions.CommandNotFoundError as error:
         if error.errno != 2:
