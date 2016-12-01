@@ -23,6 +23,8 @@ def get_vexrc(options, environ):
     if options.config and not os.path.exists(options.config):
         raise exceptions.InvalidVexrc("nonexistent config: {0!r}".format(options.config))
     filename = options.config or os.path.expanduser('~/.vexrc')
+    if options.verbose and os.path.exists(filename):
+        print('[*] Using config {0}'.format(filename))
     vexrc = config.Vexrc.from_file(filename, environ)
     return vexrc
 
@@ -150,20 +152,23 @@ def _main(environ, argv):
     ve_base = vexrc.get_ve_base(environ)
     ve_name = get_virtualenv_name(options)
     command = get_command(options, vexrc, environ)
-    # Either we create ve_path, get it from options.path or find it
-    # in ve_base.
-    if options.make:
-        if options.path:
-            make_path = os.path.abspath(options.path)
-        else:
-            make_path = os.path.abspath(os.path.join(ve_base, ve_name))
-        handle_make(environ, options, make_path)
-        ve_path = make_path
-    elif options.path:
+    if options.verbose:
+        print('[*] Dir with virtualenvs: {0}'.format(ve_base))
+        print('[*] Name of virtualenv: {0}'.format(ve_name))
+        print('[*] Command to run: {0}'.format(command))
+
+    if options.path:
         ve_path = os.path.abspath(options.path)
         if not os.path.exists(ve_path) or not os.path.isdir(ve_path):
             raise exceptions.InvalidVirtualenv(
                 "argument for --path is not a directory")
+    else:
+        ve_path = os.path.abspath(os.path.join(ve_base, ve_name))
+    if options.verbose:
+        print('[*] Using path: {0}'.format(ve_path))
+
+    if options.make:
+        handle_make(environ, options, ve_path)
     else:
         try:
             ve_path = get_virtualenv_path(ve_base, ve_name)
