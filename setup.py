@@ -25,8 +25,8 @@ setup(
     packages=['vex'],
     package_data={'vex': ['shell_configs/*']},
     scripts=['scripts/vex'],
-    entry_points = {
-        'console_scripts': ['vex = vex.main:main'],
+    entry_points={
+        'console_scripts': ['vex = vex.__main__:main'],
     },
     classifiers=[
         "Topic :: Utilities",
