@@ -162,8 +162,7 @@ def _main(environ, argv):
     elif options.path:
         ve_path = os.path.abspath(options.path)
         if not os.path.exists(ve_path) or not os.path.isdir(ve_path):
-            raise exceptions.InvalidVirtualenv(
-                "argument for --path is not a directory")
+            raise exceptions.InvalidVirtualenv("argument for --path is not a directory")
     else:
         try:
             ve_path = get_virtualenv_path(ve_base, ve_name)
@@ -173,12 +172,14 @@ def _main(environ, argv):
     # get_environ has to wait until ve_path is defined, which might
     # be after a make; of course we can't run until we have env.
     env = get_environ(environ, vexrc['env'], ve_path)
-    returncode = run(command, env=env, cwd=cwd)
+    returncode = None
+    # if options.make or not (options.exit or options.remove):
+    if not options.exit:
+        returncode = run(command, env=env, cwd=cwd)
+        if returncode is None:
+            raise exceptions.InvalidCommand("command not found: {0!r}".format(command[0]))
     if options.remove:
         handle_remove(ve_path)
-    if returncode is None:
-        raise exceptions.InvalidCommand(
-            "command not found: {0!r}".format(command[0]))
     return returncode
 
 
