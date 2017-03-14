@@ -83,12 +83,16 @@ def make_arg_parser():
         action="store_true"
     )
     parser.add_argument(
+        '-X', '--exit',
+        help="Do not enter the shell environment",
+        action="store_true"
+    )
+    parser.add_argument(
         "rest",
         nargs=argparse.REMAINDER,
         help=argparse.SUPPRESS)
 
     return parser
-
 
 
 def get_options(argv):
