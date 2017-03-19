@@ -44,7 +44,12 @@ def get_environ(environ, defaults, ve_path):
         # manually remove the virtualenv's bin.
         # A virtualenv's bin should not normally be on PATH except
         # via activate or similar, so I'm OK with this solution.
-        current_ve_bin = os.path.join(current_ve, 'bin')
+
+        if platform.system() == 'Windows':
+            current_ve_bin = os.path.join(current_ve, 'Scripts')
+        else:
+            current_ve_bin = os.path.join(current_ve, 'bin')
+
         try:
             segments.remove(current_ve_bin)
         except ValueError:
