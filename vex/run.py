@@ -44,19 +44,16 @@ def get_environ(environ, defaults, ve_path):
         # manually remove the virtualenv's bin.
         # A virtualenv's bin should not normally be on PATH except
         # via activate or similar, so I'm OK with this solution.
-        current_ve_bin = os.path.join(current_ve, 'bin')
-        try:
-            segments.remove(current_ve_bin)
-        except ValueError:
-            raise exceptions.BadConfig(
-                "something set VIRTUAL_ENV prior to this vex execution, "
-                "implying that a virtualenv is already activated "
-                "and PATH should contain the virtualenv's bin directory. "
-                "Unfortunately, it doesn't: it's {0!r}. "
-                "You might want to check that PATH is not "
-                "getting clobbered somewhere, e.g. in your shell's configs."
-                .format(system_path)
-            )
+
+        if platform.system() == 'Windows':
+            current_ve_bin = os.path.join(current_ve, 'Scripts')
+        else:
+            current_ve_bin = os.path.join(current_ve, 'bin')
+        
+        segments = [
+            seg for seg in segments
+            if os.path.normpath(seg) != os.path.normpath(current_ve_bin)
+        ]
 
     segments.insert(0, ve_bin)
     env['PATH'] = os.pathsep.join(segments)
