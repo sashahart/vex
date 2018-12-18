@@ -126,7 +126,7 @@ def test_version():
     with Run(['--version'], timeout=0.5) as run:
         run.finish()
         assert run.out is not None
-        match = re.match(b'^\d+\.\d+\.\d+\n$', run.out)
+        match = re.match(br'^\d+\.\d+\.\d+\n$', run.out)
         assert match
 
 

@@ -68,7 +68,7 @@ class TestNotScary(object):
     """Test that scary_path does not puke on expected cases.
 
     The implementation is not expected to look for special patterns
-    but to use general mechanisms like \w.
+    but to use general mechanisms like \\w.
     """
     def test_normal(self):
         assert not scary(b"/home/user/whatever")
