@@ -60,10 +60,11 @@ def handle_make(environ, options, make_path):
         raise exceptions.VirtualenvNotMade("error creating virtualenv")
     if os.name != 'nt':
         pydoc_path = os.path.join(make_path, 'bin', 'pydoc')
-        with open(pydoc_path, 'wb') as out:
-            out.write(PYDOC_SCRIPT)
-        perms = os.stat(pydoc_path).st_mode
-        os.chmod(pydoc_path, perms | 0o0111)
+        if os.path.exists(os.path.dirname(pydoc_path)):
+            with open(pydoc_path, 'wb') as out:
+                out.write(PYDOC_SCRIPT)
+            perms = os.stat(pydoc_path).st_mode
+            os.chmod(pydoc_path, perms | 0o0111)
     else:
         pydoc_path = os.path.join(make_path, 'Scripts', 'pydoc.bat')
         with open(pydoc_path, 'wb') as out:
