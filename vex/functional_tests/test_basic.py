@@ -14,6 +14,9 @@ if sys.version_info < (3, 0):
     FileNotFoundError = OSError
 
 
+HERE = os.path.dirname(os.path.abspath(__file__))
+
+
 logging.basicConfig(level=logging.DEBUG)
 
 
@@ -417,6 +420,34 @@ class TestMakeAndRemove(object):
             assert run.returned == 0
             assert not run.err
             assert os.path.exists(venv_path)
+        parent.close()
+
+    def test_make_with_vexrc_python(self):
+        parent = TempDir()
+        venv_name = b'make_test_vexrc_python'
+        venv_path = os.path.join(parent.path, venv_name)
+        assert not os.path.exists(venv_path)
+        assert os.path.exists(parent.path)
+        home = TempDir()
+        env = {
+            'HOME': home.path,
+            'WORKON_HOME': parent.path.decode('utf-8')
+        }
+        not_python = os.path.join(HERE, "not_python")
+        vexrc = TempVexrcFile(
+            home.path,
+            virtualenvs=parent.path.decode('utf-8'),
+            python=not_python,
+        )
+        run = Run(['--make', venv_name, 'echo', '42'], env=env)
+        with home, vexrc, run:
+            run.finish()
+            assert run.out is not None
+            assert b'not python' in run.out
+            assert b'42' in run.out
+            assert run.command_found
+            assert run.returned == 0
+            assert not run.err
         parent.close()
 
     def test_remove(self):
