@@ -74,6 +74,7 @@ class Vexrc(object):
                 self.headings[heading] = OrderedDict()
             self.headings[heading][key] = value
         parsing.close()
+        return None
 
     def get_ve_base(self, environ):
         """Find a directory to look for virtualenvs in.
@@ -116,12 +117,12 @@ class Vexrc(object):
         command = shlex.split(command) if command else None
         return command
 
-
     def get_default_python(self, environ):
         """Find a command to run.
         """
         runtime = self.headings[self.default_heading].get('python')
         return runtime if runtime else None
+
 
 def extract_heading(line):
     """Return heading in given line or None if it's not a heading.
