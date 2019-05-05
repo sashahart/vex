@@ -21,7 +21,9 @@ def get_vexrc(options, environ):
     # Complain if user specified nonexistent file with --config.
     # But we don't want to complain just because ~/.vexrc doesn't exist.
     if options.config and not os.path.exists(options.config):
-        raise exceptions.InvalidVexrc("nonexistent config: {0!r}".format(options.config))
+        raise exceptions.InvalidVexrc(
+            "nonexistent config: {0!r}".format(options.config)
+        )
     filename = options.config or os.path.expanduser("~/.vexrc")
     vexrc = config.Vexrc.from_file(filename, environ)
     return vexrc
