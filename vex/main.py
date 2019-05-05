@@ -168,6 +168,12 @@ def _main(environ, argv):
                         "the python specified in vexrc isn't executable: "
                         "{!r}".format(options.python)
                     )
+        elif hasattr(shutil, "which"):
+            if not shutil.which(options.python):
+                raise exceptions.InvalidVirtualenv(
+                    "the python specified by --python isn't executable: "
+                    "{!r}".format(options.python)
+                )
         handle_make(environ, options, make_path)
         ve_path = make_path
     elif options.path:
