@@ -407,12 +407,20 @@ class TestWithVirtualenv(object):
 class TestMakeAndRemove(object):
     def test_make(self):
         parent = TempDir()
+        home = TempDir()
+        env = {
+            "HOME": home.path,
+            "WORKON_HOME": parent.path.decode("utf-8"),
+        }
         venv_name = b"make_test"
         venv_path = os.path.join(parent.path, venv_name)
         assert not os.path.exists(venv_path)
         assert os.path.exists(parent.path)
-        env = {"WORKON_HOME": parent.path.decode("utf-8")}
-        with Run(["--make", venv_name, "echo", "42"], env=env) as run:
+        run = Run(["--make", venv_name, "echo", "42"], env=env)
+        vexrc = TempVexrcFile(
+            home.path,
+        )
+        with home, vexrc, run:
             run.finish()
             assert run.out is not None
             assert b"42" in run.out
@@ -431,7 +439,7 @@ class TestMakeAndRemove(object):
         home = TempDir()
         env = {
             "HOME": home.path,
-            "WORKON_HOME": parent.path.decode("utf-8")
+            "WORKON_HOME": parent.path.decode("utf-8"),
         }
         not_python = os.path.join(HERE, "not_python")
         vexrc = TempVexrcFile(
@@ -452,12 +460,20 @@ class TestMakeAndRemove(object):
 
     def test_remove(self):
         parent = TempDir()
+        home = TempDir()
+        env = {
+            "HOME": home.path,
+            "WORKON_HOME": parent.path.decode("utf-8")
+        }
         venv = TempVenv(parent.path, "vex_tests", [])
         venv.open()
         assert os.path.exists(venv.path)
         assert os.path.exists(parent.path)
-        env = {"WORKON_HOME": parent.path.decode("utf-8")}
-        with Run(["--remove", venv.name, "echo", "42"], env=env) as run:
+        run = Run(["--remove", venv.name, "echo", "42"], env=env)
+        vexrc = TempVexrcFile(
+            home.path,
+        )
+        with home, vexrc, run:
             run.finish()
             assert run.out is not None
             assert b"42" in run.out
@@ -471,15 +487,23 @@ class TestMakeAndRemove(object):
 
     def test_make_and_remove(self):
         parent = TempDir()
-        env = {"WORKON_HOME": parent.path.decode("utf-8")}
+        home = TempDir()
+        env = {
+            "HOME": home.path,
+            "WORKON_HOME": parent.path.decode("utf-8"),
+        }
         venv_name = b"make_and_remove"
         venv_path = os.path.join(parent.path, venv_name)
         assert os.path.exists(parent.path)
         assert not os.path.exists(venv_path)
-        with Run(["--make", "--remove", venv_name,
-                  "python", "-c",
-                  "import os; print(os.environ.get('VIRTUAL_ENV'))"
-                  ], env=env) as run:
+        run = Run([
+            "--make", "--remove", venv_name,
+            "python", "-c", "import os; print(os.environ.get('VIRTUAL_ENV'))"
+        ], env=env)
+        vexrc = TempVexrcFile(
+            home.path,
+        )
+        with home, vexrc, run:
             run.finish()
             assert run.out
             lines = [line.strip() for line in run.out.strip().split(b"\n")]
@@ -495,12 +519,19 @@ class TestMakeAndRemove(object):
 
     def test_pydoc(self):
         parent = TempDir()
-        env = {"WORKON_HOME": parent.path.decode("utf-8")}
+        home = TempDir()
+        env = {
+            "HOME": home.path,
+            "WORKON_HOME": parent.path.decode("utf-8"),
+        }
         venv_name = b"test_pydoc"
         venv_path = os.path.join(parent.path, venv_name)
         assert not os.path.exists(venv_path)
-        with Run(["--make", "--remove", venv_name,
-                  "pydoc", "pip"], env=env) as run:
+        run = Run(["--make", "--remove", venv_name, "pydoc", "pip"], env=env)
+        vexrc = TempVexrcFile(
+            home.path,
+        )
+        with home, vexrc, run:
             run.finish(b"q")
             assert run.command_found
             assert run.returned == 0
