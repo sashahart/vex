@@ -2,6 +2,7 @@
 """
 import sys
 import os
+import shutil
 from vex import config
 from vex.options import get_options
 from vex.run import get_environ, run
@@ -161,6 +162,12 @@ def _main(environ, argv):
             make_path = os.path.abspath(os.path.join(ve_base, ve_name))
         if options.python is None:
             options.python = vexrc.get_default_python(environ)
+            if options.python and hasattr(shutil, "which"):
+                if not shutil.which(options.python):
+                    raise exceptions.InvalidVirtualenv(
+                        "the python specified in vexrc isn't executable: "
+                        "{!r}".format(options.python)
+                    )
         handle_make(environ, options, make_path)
         ve_path = make_path
     elif options.path:
