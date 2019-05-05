@@ -137,13 +137,14 @@ def extract_key_value(line, environ):
     # '{foo}' passes through literally
     # "{foo}" substitutes from environ's foo
     value = value.strip()
-    if value[0] == "'" and _SQUOTE_RE.match(value):
-        value = value[1:-1]
-    elif value[0] == '"' and _DQUOTE_RE.match(value):
-        template = value[1:-1]
-        value = template.format(**environ)
+    if value:
+        if value[0] == "'" and _SQUOTE_RE.match(value):
+            value = value[1:-1]
+        elif value[0] == '"' and _DQUOTE_RE.match(value):
+            template = value[1:-1]
+            value = template.format(**environ)
+        value = value.strip()
     key = key.strip()
-    value = value.strip()
     return key, value
 
 
