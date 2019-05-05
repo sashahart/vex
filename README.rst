@@ -320,6 +320,14 @@ that the place to look for named virtualenvs
 is ``~/.my_virtualenvs``; and that processes you launched with vex should all
 get certain environment variables (in this case, ``ANSWER`` set to ``42``).
 
+Thanks to `Nick Coghlan <https://github.com/ncoghlan>`_, there is also an
+option to specify the default python you want to use, if you haven't specified
+it. Here's an example line you could put in vexrc::
+
+    python=python3
+
+(Equivalent to always specifying ``--python python3`` when using ``vex -m``.)
+
 If you want to use a config someplace other than ``~/.vexrc``::
 
     vex --config ~/.tempvexrc foo bash
