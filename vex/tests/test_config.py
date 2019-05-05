@@ -13,12 +13,12 @@ env:
 
 arbitrary:
     x=y
-""".lstrip().encode('utf-8')
+""".lstrip().encode("utf-8")
 
 EXPAND_VEXRC = """
 a="{SHELL}"
 b='{SHELL}'
-""".lstrip().encode('utf-8')
+""".lstrip().encode("utf-8")
 
 
 class TestExtractHeading(object):
@@ -47,8 +47,8 @@ class TestExtractKeyValue(object):
 
 class TestParseVexrc(object):
     def test_error(self):
-        stream = BytesIO(b'foo\n')
-        stream.name = 'fred'
+        stream = BytesIO(b"foo\n")
+        stream.name = "fred"
         it = config.parse_vexrc(stream, {})
         try:
             next(it)
@@ -57,7 +57,7 @@ class TestParseVexrc(object):
         assert rendered == "errors in 'fred', lines [0]"
 
     def test_close(self):
-        stream = BytesIO(b'a=b\nc=d\n')
+        stream = BytesIO(b"a=b\nc=d\n")
         it = config.parse_vexrc(stream, {})
         next(it)
         it.close()
@@ -67,95 +67,95 @@ class TestVexrc(object):
 
     def test_read_nonexistent(self):
         vexrc = config.Vexrc()
-        vexrc.read('unlikely_to_exist_1293', {})
+        vexrc.read("unlikely_to_exist_1293", {})
 
     def test_read_empty(self):
-        with patch('vex.config.open', create=True) as mock_open:
-            mock_open.return_value = BytesIO(b'')
-            vexrc = config.Vexrc.from_file('stuff', {})
-            assert vexrc['food'] is None
+        with patch("vex.config.open", create=True) as mock_open:
+            mock_open.return_value = BytesIO(b"")
+            vexrc = config.Vexrc.from_file("stuff", {})
+            assert vexrc["food"] is None
 
     def test_read_typical(self):
-        with patch('vex.config.open', create=True) as mock_open:
+        with patch("vex.config.open", create=True) as mock_open:
             mock_open.return_value = BytesIO(TYPICAL_VEXRC)
-            vexrc = config.Vexrc.from_file('stuff', {})
-            assert list(vexrc['root'].items()) == [('shell', 'bash')]
-            assert list(vexrc['env'].items()) == [('ANSWER', '42')]
-            assert list(vexrc['arbitrary'].items()) == [('x', 'y')]
+            vexrc = config.Vexrc.from_file("stuff", {})
+            assert list(vexrc["root"].items()) == [("shell", "bash")]
+            assert list(vexrc["env"].items()) == [("ANSWER", "42")]
+            assert list(vexrc["arbitrary"].items()) == [("x", "y")]
 
     def test_read_expand(self):
-        environ = {'SHELL': 'smash'}
-        with patch('vex.config.open', create=True) as mock_open:
+        environ = {"SHELL": "smash"}
+        with patch("vex.config.open", create=True) as mock_open:
             mock_open.return_value = BytesIO(EXPAND_VEXRC)
-            vexrc = config.Vexrc.from_file('stuff', environ)
-            assert vexrc['root'] == {
-                'a': 'smash',
-                'b': '{SHELL}',
+            vexrc = config.Vexrc.from_file("stuff", environ)
+            assert vexrc["root"] == {
+                "a": "smash",
+                "b": "{SHELL}",
             }
 
     def test_get_ve_base_in_vexrc_file(self):
         vexrc = config.Vexrc()
         root = vexrc.headings[vexrc.default_heading]
 
-        fake_exists = make_fake_exists(['/specific/override'])
-        root['virtualenvs'] = '/specific/override'
-        with FakeEnviron(WORKON_HOME='tempting', HOME='nonsense'), \
+        fake_exists = make_fake_exists(["/specific/override"])
+        root["virtualenvs"] = "/specific/override"
+        with FakeEnviron(WORKON_HOME="tempting", HOME="nonsense"), \
                 PatchedModule(os.path, exists=fake_exists):
-            environ = {'WORKON_HOME': '/bad1', 'HOME': '/bad2'}
-            assert vexrc.get_ve_base(environ) == '/specific/override'
+            environ = {"WORKON_HOME": "/bad1", "HOME": "/bad2"}
+            assert vexrc.get_ve_base(environ) == "/specific/override"
 
     def test_get_ve_base_not_in_vexrc_file_rather_workon_home(self):
         vexrc = config.Vexrc()
         root = vexrc.headings[vexrc.default_heading]
-        assert 'virtualenvs' not in root
+        assert "virtualenvs" not in root
 
-        fake_exists = make_fake_exists(['/workon/home'])
-        with FakeEnviron(WORKON_HOME='tempting', HOME='nonsense'), \
+        fake_exists = make_fake_exists(["/workon/home"])
+        with FakeEnviron(WORKON_HOME="tempting", HOME="nonsense"), \
                 PatchedModule(os.path, exists=fake_exists):
-            environ = {'WORKON_HOME': '/workon/home', 'HOME': '/bad'}
-            assert vexrc.get_ve_base(environ) == '/workon/home'
+            environ = {"WORKON_HOME": "/workon/home", "HOME": "/bad"}
+            assert vexrc.get_ve_base(environ) == "/workon/home"
 
     def test_get_ve_base_not_in_vexrc_file_rather_home(self):
         vexrc = config.Vexrc()
         root = vexrc.headings[vexrc.default_heading]
-        assert 'virtualenvs' not in root
+        assert "virtualenvs" not in root
 
-        fake_exists = make_fake_exists(['/home/user', '/home/user/.virtualenvs'])
-        with FakeEnviron(WORKON_HOME='tempting', HOME='nonsense'), \
+        fake_exists = make_fake_exists(["/home/user", "/home/user/.virtualenvs"])
+        with FakeEnviron(WORKON_HOME="tempting", HOME="nonsense"), \
                 PatchedModule(os.path, exists=fake_exists):
-            environ = {'HOME': '/home/user'}
-            assert vexrc.get_ve_base(environ) == '/home/user/.virtualenvs'
+            environ = {"HOME": "/home/user"}
+            assert vexrc.get_ve_base(environ) == "/home/user/.virtualenvs"
 
     def test_get_ve_base_not_in_vexrc_no_keys(self):
         vexrc = config.Vexrc()
         root = vexrc.headings[vexrc.default_heading]
-        assert 'virtualenvs' not in root
-        with FakeEnviron(WORKON_HOME='tempting', HOME='nonsense'), \
-                PatchedModule(os.path, expanduser=lambda p: ''):
+        assert "virtualenvs" not in root
+        with FakeEnviron(WORKON_HOME="tempting", HOME="nonsense"), \
+                PatchedModule(os.path, expanduser=lambda p: ""):
             environ = {}
-            assert vexrc.get_ve_base(environ) == ''
+            assert vexrc.get_ve_base(environ) == ""
 
     def test_get_ve_base_not_in_vexrc_no_values(self):
         vexrc = config.Vexrc()
         root = vexrc.headings[vexrc.default_heading]
-        assert 'virtualenvs' not in root
-        with FakeEnviron(WORKON_HOME='tempting', HOME='nonsense'), \
-        PatchedModule(os.path, expanduser=lambda p: ''):
-            environ = {'WORKON_HOME': '', 'HOME': ''}
-            assert vexrc.get_ve_base(environ) == ''
+        assert "virtualenvs" not in root
+        with FakeEnviron(WORKON_HOME="tempting", HOME="nonsense"), \
+        PatchedModule(os.path, expanduser=lambda p: ""):
+            environ = {"WORKON_HOME": "", "HOME": ""}
+            assert vexrc.get_ve_base(environ) == ""
 
     def test_ve_base_fake_windows(self):
         vexrc = config.Vexrc()
-        environ = {'HOMEDRIVE': 'C:', 'HOMEPATH': 'foo', 'WORKON_HOME': ''}
-        with patch('platform.system', return_value='Windows'), \
-             patch('os.name', new='nt'), \
-             patch('os.path.exists', return_value=True), \
-            patch('os.path.isfile', return_value=False):
+        environ = {"HOMEDRIVE": "C:", "HOMEPATH": "foo", "WORKON_HOME": ""}
+        with patch("platform.system", return_value="Windows"), \
+             patch("os.name", new="nt"), \
+             patch("os.path.exists", return_value=True), \
+            patch("os.path.isfile", return_value=False):
             path = vexrc.get_ve_base(environ)
             import platform
-            assert platform.system() == 'Windows'
-            assert os.name == 'nt'
+            assert platform.system() == "Windows"
+            assert os.name == "nt"
             import logging
             logging.error("path is %r", path)
             assert path
-            assert path.startswith('C:')
+            assert path.startswith("C:")

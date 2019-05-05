@@ -7,13 +7,13 @@ import shlex
 import platform
 from collections import OrderedDict
 
-_IDENTIFIER_PATTERN = '[a-zA-Z][_a-zA-Z0-9]*'
+_IDENTIFIER_PATTERN = "[a-zA-Z][_a-zA-Z0-9]*"
 _SQUOTE_RE = re.compile(r"'([^']*)'\Z")  # NO squotes inside
 _DQUOTE_RE = re.compile(r'"([^"]*)"\Z')  # NO dquotes inside
 _HEADING_RE = re.compile(
-    r'^(' + _IDENTIFIER_PATTERN + r'):[ \t\n\r]*\Z')
+    r"^(" + _IDENTIFIER_PATTERN + r"):[ \t\n\r]*\Z")
 _VAR_RE = re.compile(
-    r'[ \t]*(' + _IDENTIFIER_PATTERN + r') *= *(.*)[ \t\n\r]*$')
+    r"[ \t]*(" + _IDENTIFIER_PATTERN + r") *= *(.*)[ \t\n\r]*$")
 
 
 if sys.version_info < (3, 3):
@@ -45,7 +45,7 @@ class Vexrc(object):
         self.encoding = self.default_encoding
         self.headings = OrderedDict()
         self.headings[self.default_heading] = OrderedDict()
-        self.headings['env'] = OrderedDict()
+        self.headings["env"] = OrderedDict()
 
     def __getitem__(self, key):
         return self.headings.get(key)
@@ -62,7 +62,7 @@ class Vexrc(object):
         """Read data from file into this vexrc instance.
         """
         try:
-            inp = open(path, 'rb')
+            inp = open(path, "rb")
         except FileNotFoundError as error:
             if error.errno != 2:
                 raise
@@ -84,43 +84,43 @@ class Vexrc(object):
         # 2. WORKON_HOME (as defined for virtualenvwrapper's benefit)
         # 3. $HOME/.virtualenvs
         # (unless we got --path, then we don't need it)
-        ve_base_value = self.headings[self.default_heading].get('virtualenvs')
+        ve_base_value = self.headings[self.default_heading].get("virtualenvs")
         if ve_base_value:
             ve_base = os.path.expanduser(ve_base_value)
         else:
-            ve_base = environ.get('WORKON_HOME', '')
+            ve_base = environ.get("WORKON_HOME", "")
         if not ve_base:
-            # On Cygwin os.name == 'posix' and we want $HOME.
-            if platform.system() == 'Windows' and os.name == 'nt':
-                _win_drive = environ.get('HOMEDRIVE')
-                home = environ.get('HOMEPATH', '')
+            # On Cygwin os.name == "posix" and we want $HOME.
+            if platform.system() == "Windows" and os.name == "nt":
+                _win_drive = environ.get("HOMEDRIVE")
+                home = environ.get("HOMEPATH", "")
                 if home:
                     home = os.path.join(_win_drive, home)
             else:
-                home = environ.get('HOME', '')
+                home = environ.get("HOME", "")
             if not home:
-                home = os.path.expanduser('~')
+                home = os.path.expanduser("~")
             if not home:
-                return ''
-            ve_base = os.path.join(home, '.virtualenvs')
+                return ""
+            ve_base = os.path.join(home, ".virtualenvs")
         # pass through invalid paths so messages can be generated
         # if not os.path.exists(ve_base) or os.path.isfile(ve_base):
-            # return ''
-        return ve_base or ''
+            # return ""
+        return ve_base or ""
 
     def get_shell(self, environ):
         """Find a command to run.
         """
-        command = self.headings[self.default_heading].get('shell')
-        if not command and os.name != 'nt':
-            command = environ.get('SHELL', '')
+        command = self.headings[self.default_heading].get("shell")
+        if not command and os.name != "nt":
+            command = environ.get("SHELL", "")
         command = shlex.split(command) if command else None
         return command
 
     def get_default_python(self, environ):
         """Find a command to run.
         """
-        runtime = self.headings[self.default_heading].get('python')
+        runtime = self.headings[self.default_heading].get("python")
         return runtime if runtime else None
 
 

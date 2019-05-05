@@ -12,19 +12,19 @@ class TempVenv(object):
         self.parent = parent
         self.name = name
         self.args = args or []
-        self.path = os.path.join(parent, name.encode('utf-8'))
+        self.path = os.path.join(parent, name.encode("utf-8"))
         self.open()
 
     def open(self):
         assert isinstance(self.parent, path_type)
         assert os.path.exists(self.parent)
-        args = ['virtualenv', '--quiet', self.path] + self.args
+        args = ["virtualenv", "--quiet", self.path] + self.args
         if not os.path.exists(self.path):
             process = Popen(args)
             process.wait()
             assert process.returncode == 0
         assert os.path.exists(self.path)
-        bin_path = os.path.join(self.path, b'bin')
+        bin_path = os.path.join(self.path, b"bin")
         assert os.path.exists(bin_path)
 
     def close(self):

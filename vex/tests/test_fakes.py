@@ -18,6 +18,6 @@ class TestObject(object):
 def test_make_fake_exists():
     """Test that make_fake_exists itself works as intended.
     """
-    fake_exists = fakes.make_fake_exists(['/special'])
-    assert fake_exists('/special')
-    assert not fake_exists('/dev')
+    fake_exists = fakes.make_fake_exists(["/special"])
+    assert fake_exists("/special")
+    assert not fake_exists("/dev")

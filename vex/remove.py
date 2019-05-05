@@ -4,13 +4,13 @@ from vex import exceptions
 
 
 def obviously_not_a_virtualenv(path):
-    include = os.path.join(path, 'include')
-    bin = os.path.join(path, 'bin')
-    scripts = os.path.join(path, 'Scripts')
+    include = os.path.join(path, "include")
+    bin = os.path.join(path, "bin")
+    scripts = os.path.join(path, "Scripts")
     if not os.path.exists(bin) and not os.path.exists(scripts):
         return True
     if os.path.exists(include) and not any(
-            filename.startswith('py') for filename in os.listdir(include)
+            filename.startswith("py") for filename in os.listdir(include)
     ):
         return True
     return False
@@ -20,7 +20,7 @@ def handle_remove(ve_path):
     if not os.path.exists(ve_path):
         return
     if hasattr(os, "geteuid"):
-        if os.geteuid() == 0 or os.environ.get('USER', '') == 'root':
+        if os.geteuid() == 0 or os.environ.get("USER", "") == "root":
             raise exceptions.VirtualenvNotRemoved(
                 "not removing any directory as root user")
     if ve_path in ("/", "\\"):

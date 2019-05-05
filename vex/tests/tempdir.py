@@ -14,13 +14,13 @@ class TempDir(object):
 
     def _sanity(self):
         assert isinstance(self.path, path_type)
-        assert b'..' not in self.path
-        assert self.path not in (b'', b'/', b'//')
+        assert b".." not in self.path
+        assert self.path not in (b"", b"/", b"//")
         assert os.path.exists(self.path)
         assert os.path.isdir(self.path)
 
     def open(self):
-        self.path = tempfile.mkdtemp().encode('utf-8')
+        self.path = tempfile.mkdtemp().encode("utf-8")
         self._sanity()
 
     def close(self):

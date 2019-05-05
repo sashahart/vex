@@ -22,7 +22,7 @@ def get_vexrc(options, environ):
     # But we don't want to complain just because ~/.vexrc doesn't exist.
     if options.config and not os.path.exists(options.config):
         raise exceptions.InvalidVexrc("nonexistent config: {0!r}".format(options.config))
-    filename = options.config or os.path.expanduser('~/.vexrc')
+    filename = options.config or os.path.expanduser("~/.vexrc")
     vexrc = config.Vexrc.from_file(filename, environ)
     return vexrc
 
@@ -42,7 +42,7 @@ def get_virtualenv_name(options):
     if options.path:
         return os.path.dirname(options.path)
     else:
-        ve_name = options.rest.pop(0) if options.rest else ''
+        ve_name = options.rest.pop(0) if options.rest else ""
     if not ve_name:
         raise exceptions.NoVirtualenvName(
             "could not find a virtualenv name in the command line."
@@ -74,12 +74,12 @@ def get_virtualenv_path(ve_base, ve_name):
     # and an absolute path will be accepted as first arg.
     # So we check if they gave an absolute path as ve_name.
     # But we don't want this error if $PWD == $WORKON_HOME,
-    # in which case 'foo' is a valid relative path to virtualenv foo.
+    # in which case "foo" is a valid relative path to virtualenv foo.
     ve_path = os.path.join(ve_base, ve_name)
     if ve_path == ve_name and os.path.basename(ve_name) != ve_name:
         raise exceptions.InvalidVirtualenv(
-            'To run in a virtualenv by its path, '
-            'use "vex --path {0}"'.format(ve_path))
+            "To run in a virtualenv by its path, "
+            "use 'vex --path {0}'".format(ve_path))
 
     ve_path = os.path.abspath(ve_path)
     if not os.path.exists(ve_path):
@@ -97,7 +97,7 @@ def get_command(options, vexrc, environ):
     command = options.rest
     if not command:
         command = vexrc.get_shell(environ)
-    if command and command[0].startswith('--'):
+    if command and command[0].startswith("--"):
         raise exceptions.InvalidCommand(
             "don't put flags like '%s' after the virtualenv name."
             % command[0])
@@ -174,7 +174,7 @@ def _main(environ, argv):
             raise
     # get_environ has to wait until ve_path is defined, which might
     # be after a make; of course we can't run until we have env.
-    env = get_environ(environ, vexrc['env'], ve_path)
+    env = get_environ(environ, vexrc["env"], ve_path)
     returncode = run(command, env=env, cwd=cwd)
     if options.remove:
         handle_remove(ve_path)
@@ -193,7 +193,7 @@ def main():
         returncode = _main(os.environ, argv)
     except exceptions.InvalidArgument as error:
         if error.message:
-            sys.stderr.write("Error: " + error.message + '\n')
+            sys.stderr.write("Error: " + error.message + "\n")
         else:
             raise
     sys.exit(returncode)

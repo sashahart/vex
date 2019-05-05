@@ -4,7 +4,7 @@ import os
 class Object(object):
     def __init__(self, **kwargs):
         for key, value in kwargs.items():
-            if key.startswith('_'):
+            if key.startswith("_"):
                 continue
             setattr(self, key, value)
 
