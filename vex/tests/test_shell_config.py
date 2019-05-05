@@ -100,9 +100,6 @@ class TestScary(object):
     not strict enough.
     """
 
-    # def test_tilde_expansion(self):
-    #     assert scary(b'~')
-
     def test_empty(self):
         """Empty variables can combine in surprising ways in shell
 
