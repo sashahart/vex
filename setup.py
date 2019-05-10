@@ -23,7 +23,7 @@ setup(
     keywords="virtualenv virtualenvwrapper workon installation deployment",
     install_requires=['virtualenv'],
     packages=['vex'],
-    package_data={'vex': ['shell_configs/*']},
+    package_data={'vex': ['shell_configs/*', 'functional_tests/not_python']},
     scripts=['scripts/vex'],
     entry_points = {
         'console_scripts': ['vex = vex.main:main'],

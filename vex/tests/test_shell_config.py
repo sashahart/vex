@@ -6,8 +6,8 @@ from mock import patch
 class TestShellConfigFor(object):
     def test_unknown_shell(self):
         vexrc = Vexrc()
-        output = shell_config_for('unlikely_name', vexrc, {})
-        assert output.strip() == b''
+        output = shell_config_for("unlikely_name", vexrc, {})
+        assert output.strip() == b""
 
     def test_bash_config(self):
         vexrc = Vexrc()
@@ -26,49 +26,49 @@ class TestShellConfigFor(object):
 
     def test_bash_config_not_scary(self):
         vexrc = Vexrc()
-        with patch('os.path.exists', returnvalue=True):
-            output = shell_config_for("bash", vexrc, {'WORKON_HOME': '/hoorj'})
+        with patch("os.path.exists", returnvalue=True):
+            output = shell_config_for("bash", vexrc, {"WORKON_HOME": "/hoorj"})
         assert output
-        assert b'/hoorj' in output
+        assert b"/hoorj" in output
 
     def test_zsh_config_not_scary(self):
         vexrc = Vexrc()
-        with patch('os.path.exists', returnvalue=True):
-            output = shell_config_for("zsh", vexrc, {'WORKON_HOME': '/hoorj'})
+        with patch("os.path.exists", returnvalue=True):
+            output = shell_config_for("zsh", vexrc, {"WORKON_HOME": "/hoorj"})
         assert output
-        assert b'/hoorj' in output
+        assert b"/hoorj" in output
 
     def test_fish_config_not_scary(self):
         vexrc = Vexrc()
-        with patch('os.path.exists', returnvalue=True):
-            output = shell_config_for("fish", vexrc, {'WORKON_HOME': '/hoorj'})
+        with patch("os.path.exists", returnvalue=True):
+            output = shell_config_for("fish", vexrc, {"WORKON_HOME": "/hoorj"})
         assert output
-        assert b'/hoorj' in output
+        assert b"/hoorj" in output
 
     def test_bash_config_scary(self):
         vexrc = Vexrc()
-        output = shell_config_for("bash", vexrc, {'WORKON_HOME': '$x'})
+        output = shell_config_for("bash", vexrc, {"WORKON_HOME": "$x"})
         assert output
-        assert b'$x' not in output
+        assert b"$x" not in output
 
     def test_zsh_config_scary(self):
         vexrc = Vexrc()
-        output = shell_config_for("zsh", vexrc, {'WORKON_HOME': '$x'})
+        output = shell_config_for("zsh", vexrc, {"WORKON_HOME": "$x"})
         assert output
-        assert b'$x' not in output
+        assert b"$x" not in output
 
     def test_fish_config_scary(self):
         vexrc = Vexrc()
-        output = shell_config_for("fish", vexrc, {'WORKON_HOME': '$x'})
+        output = shell_config_for("fish", vexrc, {"WORKON_HOME": "$x"})
         assert output
-        assert b'$x' not in output
+        assert b"$x" not in output
 
 
 class TestNotScary(object):
     """Test that scary_path does not puke on expected cases.
 
     The implementation is not expected to look for special patterns
-    but to use general mechanisms like \w.
+    but to use general mechanisms like \\w.
     """
     def test_normal(self):
         assert not scary(b"/home/user/whatever")
@@ -96,12 +96,9 @@ class TestScary(object):
 
     It isn't expected that the implementation specifically forbids
     these, it should err on the side of strictness/whitelisting;
-    this just tests whether the given 'whitelist' is obviously
+    this just tests whether the given "whitelist" is obviously
     not strict enough.
     """
-
-    # def test_tilde_expansion(self):
-    #     assert scary(b'~')
 
     def test_empty(self):
         """Empty variables can combine in surprising ways in shell
@@ -109,17 +106,17 @@ class TestScary(object):
         and occur in a huge number of ways, intentional or not.
         So this is one of the first things to check.
         """
-        assert scary(b'')
+        assert scary(b"")
 
     def test_subshell(self):
         """prevent most obvious way of executing arbitrary cmds
         """
-        assert scary(b'$(rm anything)')
+        assert scary(b"$(rm anything)")
 
     def test_subshell_with_backticks(self):
         """also most obvious way, slightly different notation
         """
-        assert scary(b'`pwd`')
+        assert scary(b"`pwd`")
 
     def test_leading_double_quote(self):
         """prevent the most obvious way of breaking out of variable ref
@@ -130,22 +127,22 @@ class TestScary(object):
     def test_variable_expansion(self):
         """prevent second-pass substitution of variable etc.
         """
-        assert scary(b'$HOME')
+        assert scary(b"$HOME")
 
     def test_variable_expansion_with_braces(self):
         """also with braces style
         """
-        assert scary(b'${HOME}')
+        assert scary(b"${HOME}")
 
     def test_variable_expansion_with_slash(self):
-        """leading slash doesn't fool us
+        """leading slash doesn"t fool us
         """
-        assert scary(b'/${HOME}')
+        assert scary(b"/${HOME}")
 
     def test_variable_expansion_with_slash_and_suffix(self):
-        """suffix doesn't fool us either
+        """suffix doesn"t fool us either
         """
-        assert scary(b'/${HOME}/bar')
+        assert scary(b"/${HOME}/bar")
 
     def test_leading_single_quote(self):
         """prevent a less obvious way of messing with completion scripts
@@ -189,26 +186,26 @@ class TestScary(object):
     def test_comment(self):
         """Don't want to ignore to end of shell line
         """
-        assert scary(b'#foo')
-        assert scary(b'stuff  # foo')
+        assert scary(b"#foo")
+        assert scary(b"stuff  # foo")
 
     def test_arithmetic_expansion(self):
-        assert scary(b'$(( 2 + 2 ))')
+        assert scary(b"$(( 2 + 2 ))")
 
     def test_integer_expansion(self):
-        assert scary(b'$[ 2 + 2 ]')
+        assert scary(b"$[ 2 + 2 ]")
 
     def test_lt(self):
-        assert scary(b'<foo')
+        assert scary(b"<foo")
 
     def test_gt(self):
-        assert scary(b'>foo')
+        assert scary(b">foo")
 
     def test_star(self):
-        assert scary(b'*')
+        assert scary(b"*")
 
     def test_question_mark(self):
-        assert scary(b'?')
+        assert scary(b"?")
 
     def test_here(self):
         assert scary(b"<<<")

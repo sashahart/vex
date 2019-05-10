@@ -10,32 +10,32 @@ def make_arg_parser():
         usage="vex [OPTIONS] VIRTUALENV_NAME COMMAND_TO_RUN ...",
     )
 
-    make = parser.add_argument_group(title='To make a new virtualenv')
+    make = parser.add_argument_group(title="To make a new virtualenv")
     make.add_argument(
-        '-m', '--make',
+        "-m", "--make",
         action="store_true",
         help="make named virtualenv before running command"
     )
     make.add_argument(
-        '--python',
+        "--python",
         help="specify which python for virtualenv to be made",
         action="store",
         default=None,
     )
     make.add_argument(
-        '--site-packages',
+        "--site-packages",
         help="allow site package imports from new virtualenv",
         action="store_true",
     )
     make.add_argument(
-        '--always-copy',
+        "--always-copy",
         help="use copies instead of symlinks in new virtualenv",
         action="store_true",
     )
 
-    remove = parser.add_argument_group(title='To remove a virtualenv')
+    remove = parser.add_argument_group(title="To remove a virtualenv")
     remove.add_argument(
-        '-r', '--remove',
+        "-r", "--remove",
         action="store_true",
         help="remove the named virtualenv after running command"
     )
@@ -47,10 +47,10 @@ def make_arg_parser():
         action="store"
     )
     parser.add_argument(
-        '--cwd',
+        "--cwd",
         metavar="DIR",
         action="store",
-        default='.',
+        default=".",
         help="path to run command in (default: '.' aka $PWD)",
     )
     parser.add_argument(
@@ -61,7 +61,7 @@ def make_arg_parser():
         help="path to config file to read (default: '~/.vexrc')"
     )
     parser.add_argument(
-        '--shell-config',
+        "--shell-config",
         metavar="SHELL",
         dest="shell_to_configure",
         action="store",
@@ -69,7 +69,7 @@ def make_arg_parser():
         help="print optional config for the specified shell"
     )
     parser.add_argument(
-        '--list',
+        "--list",
         metavar="PREFIX",
         nargs="?",
         const="",
@@ -78,7 +78,7 @@ def make_arg_parser():
         action="store"
     )
     parser.add_argument(
-        '--version',
+        "--version",
         help="print the version of vex that is being run",
         action="store_true"
     )

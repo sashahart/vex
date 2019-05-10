@@ -16,7 +16,7 @@ except NameError:
     # (OSError, IOError)
 
 
-NOT_SCARY = re.compile(br'[~]?(?:[/]+[\w _,.][\w _\-,.]+)*\Z')
+NOT_SCARY = re.compile(br"[~]?(?:[/]+[\w _,.][\w _\-,.]+)*\Z")
 
 
 def scary_path(path):
@@ -35,17 +35,17 @@ def shell_config_for(shell, vexrc, environ):
     """return completion config for the named shell.
     """
     here = os.path.dirname(os.path.abspath(__file__))
-    path = os.path.join(here, 'shell_configs', shell)
+    path = os.path.join(here, "shell_configs", shell)
     try:
-        with open(path, 'rb') as inp:
+        with open(path, "rb") as inp:
             data = inp.read()
     except FileNotFoundError as error:
         if error.errno != 2:
             raise
-        return b''
-    ve_base = vexrc.get_ve_base(environ).encode('ascii')
+        return b""
+    ve_base = vexrc.get_ve_base(environ).encode("ascii")
     if ve_base and not scary_path(ve_base) and os.path.exists(ve_base):
-        data = data.replace(b'$WORKON_HOME', ve_base)
+        data = data.replace(b"$WORKON_HOME", ve_base)
     return data
 
 
@@ -56,7 +56,7 @@ def handle_shell_config(shell, vexrc, environ):
     data = shell_config.shell_config_for(shell, vexrc, environ)
     if not data:
         raise exceptions.OtherShell("unknown shell: {0!r}".format(shell))
-    if hasattr(sys.stdout, 'buffer'):
+    if hasattr(sys.stdout, "buffer"):
         sys.stdout.buffer.write(data)
     else:
         sys.stdout.write(data)
