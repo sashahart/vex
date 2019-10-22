@@ -32,6 +32,7 @@ class Run(object):
     def __init__(self, args=None, env=None, timeout=None):
         self.args = args or []
         self.env = env.copy() if env else {}
+        self.env['PYTHONPATH'] = os.environ['PYTHONPATH']
         self.timeout = timeout
         #
         self.timer = None
