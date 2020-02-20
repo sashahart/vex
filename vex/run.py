@@ -18,6 +18,9 @@ def get_environ(environ, defaults, ve_path):
     if "PYTHONHOME" in env:
         del env["PYTHONHOME"]
 
+    if "__PYVENV_LAUNCHER__" in env:
+        del env["__PYVENV_LAUNCHER__"]
+
     # Now we have to adjust PATH to find scripts for the virtualenv...
     # PATH being unset/empty is OK, but ve_path must be set
     # or there is nothing for us to do here and it's bad.
