@@ -39,7 +39,7 @@ end
 
 function __vex_list_virtualenvs
     # echo the names of virtualenvs available as 'vex VENVNAME'.
-	set dirs (find "$WORKON_HOME" -maxdepth 2 -name "bin" -type d -not -empty -printf '%h\n')
+	set dirs (find "$WORKON_HOME" -maxdepth 2 -name "bin" -type d -not -empty | xargs dirname)
 	for NAME in $dirs
 		basename $NAME
 	end
@@ -52,7 +52,7 @@ function __vex_list_commands
 	if [ (count $cmd) -eq 2 -a $cmd[1] = 'vex' ]
 	    set ve "$WORKON_HOME/$cmd[2]"
 	    if test -f "$ve/bin"
-			find "$ve/bin" -maxdepth 1 -executable -printf '%f\n'
+			find "$ve/bin" -maxdepth 1 -executable | xargs basename
 		end
 	end
 	set -l ctoken (commandline -ct)
@@ -62,7 +62,7 @@ end
 # If we source this, we want to wipe out previously defined vex completions
 complete -e -c vex
 # Two positional arguments, a virtualenv and a command.
-complete -c vex -n "__vex_needs_virtualenv" -d "Virtualenv" -f -a "(__vex_list_virtualenvs)" 
+complete -c vex -n "__vex_needs_virtualenv" -d "Virtualenv" -f -a "(__vex_list_virtualenvs)"
 complete -c vex -n "__vex_needs_command" -d "Command from Virtualenv" -x -a "(__vex_list_commands)"
 # Other options.
 complete -c vex -l help -s h -n "__fish_no_arguments" -d "print help information"
