@@ -39,7 +39,7 @@ end
 
 function __vex_list_virtualenvs
     # echo the names of virtualenvs available as 'vex VENVNAME'.
-	set dirs (find "$WORKON_HOME" -maxdepth 2 -name "bin" -type d -not -empty | xargs dirname)
+	set dirs (find "$WORKON_HOME" -maxdepth 2 -name "bin" -type d -not -empty | xargs -n 1 dirname)
 	for NAME in $dirs
 		basename $NAME
 	end
