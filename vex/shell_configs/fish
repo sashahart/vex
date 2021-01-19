@@ -65,6 +65,7 @@ end
 
 # If we source this, we want to wipe out previously defined vex completions
 complete -e -c vex
+complete --no-files -c vex
 # Two positional arguments, a virtualenv and a command.
 complete -c vex -n "__vex_needs_virtualenv" -d "Virtualenv" -f -a "(__vex_list_virtualenvs)"
 complete -c vex -n "__vex_needs_command" -d "Command from Virtualenv" -x -a "(__vex_list_commands)"
@@ -72,8 +73,8 @@ complete -c vex -n "__vex_needs_command" -d "Command from Virtualenv" -x -a "(__
 complete -c vex -l help -s h -n "__fish_no_arguments" -d "print help information"
 complete -c vex -l path -x -a "(__fish_complete_directories)" -d "Give absolute path to virtualenv"
 complete -c vex -l cwd -x -a "(__fish_complete_directories)" -d "Give directory to run in"
-complete -c vex -l config -r -a "" -d "Give path to vexrc file"
-complete -c vex -l shell-config -r -a "fish zsh bash" -d "print evaluable shell config"
+complete -c vex -l config -r -a "(__fish_complete_path)" -d "Give path to vexrc file"
+complete --no-files -c vex -l shell-config -r -a "fish zsh bash" -d "print evaluable shell config"
 complete -c vex -l make -s m -n "__fish_no_arguments" -d "create named virtualenv before running"
 # Options which should only be offered if user gave --make.
 complete -c vex -l python -n "__fish_contains_opt -s m make" -a PYTHON -d "specify python to use with --make"
