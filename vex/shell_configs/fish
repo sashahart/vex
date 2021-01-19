@@ -16,7 +16,9 @@ function __vex_needs_virtualenv
   set args (__vex_positional_args)
   set opts (__vex_optional_args)
   for opt in $opts
-	if [ $opt = '--path' -o $opt = '--make' -o $opt = '-m' ]
+    # Add 'x' as a prefix to workaround
+    # https://github.com/fish-shell/fish-shell/issues/5186#issuecomment-421244106
+	if [ x$opt = 'x--path' -o x$opt = 'x--make' -o x$opt = 'x-m' ]
 		return 1
 	end
   end
@@ -75,7 +77,7 @@ complete -c vex -l make -s m -n "__fish_no_arguments" -d "create named virtualen
 complete -c vex -l python -n "__fish_contains_opt -s m make" -a PYTHON -d "specify python to use with --make"
 complete -c vex -l site-packages -n "__fish_contains_opt -s m make" -d "allow import of site packages from new virtualenv"
 complete -c vex -l always-copy -n "__fish_contains_opt -s m make" -d "copy files instead of creating symlinks when making virtualenv"
-complete -c vex -l remove -s r -n "__fish_no_arguments" -d "remove named virtualenv after running"
+complete -c vex -l remove -s r -n "__vex_needs_virtualenv" -d "remove named virtualenv after running"
 
 # any switches on the end - no clear way to stop the processing!
 #complete -c vex -u
