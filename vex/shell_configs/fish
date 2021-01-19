@@ -12,11 +12,11 @@ end
 function __vex_needs_virtualenv
   # Return 0 if we should expect a virtualenv arg.
   # This is normally if there were no positional args after 'vex'.
-  # But we also don't need it if we already saw --path.
+  # But we also don't need it if we already saw --path or --make.
   set args (__vex_positional_args)
   set opts (__vex_optional_args)
   for opt in $opts
-	if [ $opt = '--path' ]
+	if [ $opt = '--path' -o $opt = '--make' -o $opt = '-m' ]
 		return 1
 	end
   end
