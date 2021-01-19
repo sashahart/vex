@@ -70,11 +70,11 @@ complete -c vex -l path -x -a "(__fish_complete_directories)" -d "Give absolute 
 complete -c vex -l cwd -x -a "(__fish_complete_directories)" -d "Give directory to run in"
 complete -c vex -l config -r -a "" -d "Give path to vexrc file"
 complete -c vex -l shell-config -r -a "fish zsh bash" -d "print evaluable shell config"
-complete -c vex -l make -n "__fish_no_arguments" -d "create named virtualenv before running"
+complete -c vex -l make -s m -n "__fish_no_arguments" -d "create named virtualenv before running"
 # Options which should only be offered if user gave --make.
-complete -c vex -l python -n "__fish_contains_opt make" -a PYTHON -d "specify python to use with --make"
-complete -c vex -l site-packages -n "__fish_contains_opt make" -d "allow import of site packages from new virtualenv"
-complete -c vex -l always-copy -n "__fish_contains_opt make" -d "copy files instead of creating symlinks when making virtualenv"
+complete -c vex -l python -n "__fish_contains_opt -s m make" -a PYTHON -d "specify python to use with --make"
+complete -c vex -l site-packages -n "__fish_contains_opt -s m make" -d "allow import of site packages from new virtualenv"
+complete -c vex -l always-copy -n "__fish_contains_opt -s m make" -d "copy files instead of creating symlinks when making virtualenv"
 complete -c vex -l remove -s r -n "__fish_no_arguments" -d "remove named virtualenv after running"
 
 # any switches on the end - no clear way to stop the processing!
