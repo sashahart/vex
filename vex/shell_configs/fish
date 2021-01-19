@@ -58,7 +58,9 @@ function __vex_list_commands
 		end
 	end
 	set -l ctoken (commandline -ct)
-	complete -C$ctoken
+  if not string match -- '-*' $ctoken
+    complete -C$ctoken
+  end
 end
 
 # If we source this, we want to wipe out previously defined vex completions
